@@ -88,6 +88,16 @@ void MainWindow::onSend() {
         if (ch == ' ' || ch == '\r' || ch == '\n') {
           continue;
         }
+        if (ch == 'x' || ch == 'X') {
+          if (isFirst == false && currentByte == 0) {
+            // 0x
+            isFirst = true;
+            continue;
+          } else {
+            // fail
+            break;
+          }
+        }
         int cur = fromHex(ch);
         if (cur == -1) {
           statusBar()->showMessage("Invalid hex");
