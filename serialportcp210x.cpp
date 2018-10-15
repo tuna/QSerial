@@ -65,7 +65,6 @@ void SerialPortCP210X::setFlowControl(QSerialPort::FlowControl flowControl) {
 bool SerialPortCP210X::open() {
   auto rc = libusb_open(device, &handle);
   if (rc == 0) {
-    qWarning() << "open";
     libusb_detach_kernel_driver(handle, 0);
     libusb_claim_interface(handle, 0);
     thread = QThread::create([this] {
@@ -90,10 +89,19 @@ void SerialPortCP210X::close() {
   libusb_close(handle);
   handle = nullptr;
 }
+void callback(libusb_transfer *transfer) {
+  delete (unsigned char *)transfer->user_data;
+  libusb_free_transfer(transfer);
+}
+
 void SerialPortCP210X::sendData(const QByteArray &data) {
-  int len = 0;
-  auto rc = libusb_bulk_transfer(handle, 0x01, (unsigned char *)data.data(),
-                                 data.length(), &len, 0);
+  auto transfer = libusb_alloc_transfer(0);
+  unsigned char *buffer = new unsigned char[data.length()];
+  memcpy(buffer, data.data(), data.length());
+
+  libusb_fill_bulk_transfer(transfer, handle, 0x01, buffer, data.length(),
+                            callback, buffer, 0);
+  libusb_submit_transfer(transfer);
 }
 
 QVector<QPair<quint16, quint16>> supportedDevices = {{0x10C4, 0xEA60},
