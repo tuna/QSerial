@@ -236,6 +236,9 @@ void MainWindow::onDataReceived(QByteArray data) {
 }
 
 void MainWindow::appendText(QString text, QColor color) {
+  auto cursor = textBrowser->textCursor();
+  cursor.movePosition(QTextCursor::End);
+  textBrowser->setTextCursor(cursor);
   textBrowser->setTextColor(color);
   textBrowser->insertPlainText(text);
   textBrowser->verticalScrollBar()->setValue(
