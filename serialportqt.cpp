@@ -1,5 +1,6 @@
 #include "serialportqt.h"
 #include <QDebug>
+#include <QSerialPortInfo>
 
 SerialPortQt::SerialPortQt(QObject *parent, QString portName)
     : SerialPort(parent) {
@@ -30,9 +31,17 @@ void SerialPortQt::close() { return port->close(); }
 void SerialPortQt::sendData(const QByteArray &data) { port->write(data); }
 
 void SerialPortQt::handleReadyRead() {
-  while(port->bytesAvailable()) {
+  while (port->bytesAvailable()) {
     auto data = port->readAll();
     qWarning() << "SerailPortQt" << data;
     emit receivedData(data);
   }
+}
+QList<SerialPort *> SerialPortQt::availablePorts(QObject *parent) {
+  QList<SerialPort *> result;
+  auto ports = QSerialPortInfo::availablePorts();
+  for (auto port : ports) {
+    result.append(new SerialPortQt(parent, port.portName()));
+  }
+  return result;
 }

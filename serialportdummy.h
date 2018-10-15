@@ -7,10 +7,9 @@ class SerialPortDummy : public SerialPort {
   Q_OBJECT
 
 public:
-  SerialPortDummy(QObject *parent = nullptr) : SerialPort(parent) {
-    isOpening = false;
+  static QList<SerialPort *> availablePorts(QObject *parent = nullptr) {
+    return QList<SerialPort *>{new SerialPortDummy(parent)};
   }
-  ~SerialPortDummy() {}
   QString portName() override { return "dummy"; }
   void setBaudRate(qint32) override {}
   void setDataBits(QSerialPort::DataBits) override {}
@@ -28,6 +27,11 @@ public slots:
   void sendData(const QByteArray &data) override { emit receivedData(data); }
 
 private:
+  SerialPortDummy(QObject *parent = nullptr) : SerialPort(parent) {
+    isOpening = false;
+  }
+  ~SerialPortDummy() {}
+
   bool isOpening;
 };
 

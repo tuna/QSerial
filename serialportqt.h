@@ -7,8 +7,7 @@ class SerialPortQt : public SerialPort {
   Q_OBJECT
 
 public:
-  SerialPortQt(QObject *parent = nullptr, QString portName = "");
-  ~SerialPortQt();
+  static QList<SerialPort *> availablePorts(QObject *parent = nullptr);
   QString portName() override;
   void setBaudRate(qint32 baudRate) override;
   void setDataBits(QSerialPort::DataBits dataBits) override;
@@ -29,6 +28,8 @@ private slots:
   void handleReadyRead();
 
 private:
+  SerialPortQt(QObject *parent = nullptr, QString portName = "");
+  ~SerialPortQt();
   QSerialPort *port;
 };
 
