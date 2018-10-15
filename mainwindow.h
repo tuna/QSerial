@@ -18,6 +18,8 @@ private slots:
   void onReset();
   void onDataReceived(QByteArray data);
   void onIdle();
+  void onOpen();
+  void onClose();
 
 private:
   QList<SerialPort *> ports;

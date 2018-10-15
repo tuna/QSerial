@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1054</width>
-    <height>737</height>
+    <width>843</width>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -846,12 +846,49 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1054</width>
+     <width>843</width>
      <height>22</height>
     </rect>
    </property>
+   <widget class="QMenu" name="menuSerial">
+    <property name="title">
+     <string>Serial</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+   </widget>
+   <addaction name="menuSerial"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen"/>
+   <addaction name="actionClose"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+   <property name="toolTip">
+    <string>Open serial port</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="toolTip">
+    <string>Close serial port</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections>
@@ -862,8 +899,8 @@
    <slot>onReset()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>793</x>
-     <y>293</y>
+     <x>722</x>
+     <y>296</y>
     </hint>
     <hint type="destinationlabel">
      <x>728</x>
@@ -878,8 +915,8 @@
    <slot>onSend()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>815</x>
-     <y>582</y>
+     <x>821</x>
+     <y>639</y>
     </hint>
     <hint type="destinationlabel">
      <x>668</x>
@@ -887,9 +924,43 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionOpen</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onOpen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionClose</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onClose()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>421</x>
+     <y>380</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onSend()</slot>
   <slot>onReset()</slot>
+  <slot>onOpen()</slot>
+  <slot>onClose()</slot>
  </slots>
 </ui>

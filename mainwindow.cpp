@@ -53,19 +53,9 @@ inline QString toHumanRate(quint64 rate) {
 
 void MainWindow::onSend() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
+  onOpen();
   if (!serialPort->isOpen()) {
-    if (serialPort->open()) {
-      statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
-                                   .arg(serialPort->portName())
-                                   .arg(baudRateComboBox->currentText().toInt())
-                                   .arg(dataBitsComboBox->currentText())
-                                   .arg(parityComboBox->currentText())
-                                   .arg(stopBitsComboBox->currentText())
-                                   .arg(flowControlComboBox->currentText()));
-    } else {
-      statusBar()->showMessage("Failed");
-      return;
-    }
+    return;
   }
 
   serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
@@ -290,4 +280,29 @@ void MainWindow::onReset() {
 void MainWindow::onIdle() {
   struct timeval tv = {};
   libusb_handle_events_timeout_completed(context, &tv, nullptr);
+}
+
+void MainWindow::onOpen() {
+  auto serialPort = ports[serialPortComboBox->currentIndex()];
+  if (!serialPort->isOpen()) {
+    if (serialPort->open()) {
+      statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
+                                   .arg(serialPort->portName())
+                                   .arg(baudRateComboBox->currentText().toInt())
+                                   .arg(dataBitsComboBox->currentText())
+                                   .arg(parityComboBox->currentText())
+                                   .arg(stopBitsComboBox->currentText())
+                                   .arg(flowControlComboBox->currentText()));
+    } else {
+      statusBar()->showMessage("Failed");
+    }
+  }
+}
+
+void MainWindow::onClose() {
+  auto serialPort = ports[serialPortComboBox->currentIndex()];
+  if (serialPort->isOpen()) {
+    serialPort->close();
+    statusBar()->showMessage("");
+  }
 }
