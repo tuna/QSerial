@@ -15,6 +15,7 @@ public:
 
 private slots:
   void onSend();
+  void onReset();
   void onDataReceived(QByteArray data);
 
 private:

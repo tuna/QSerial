@@ -511,6 +511,62 @@
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="horizontalLayoutWidget_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>70</y>
+       <width>201</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_10">
+      <item>
+       <widget class="QLabel" name="label_11">
+        <property name="text">
+         <string>Line Ending:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_10">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QComboBox" name="lineEndingComboBox">
+        <item>
+         <property name="text">
+          <string>LF (\n)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>CR LF (\r \n)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>CR (\r)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>None</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </widget>
    <widget class="QPlainTextEdit" name="inputPlainTextEdit">
     <property name="geometry">
@@ -687,8 +743,8 @@
    <slot>onSend()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>695</x>
-     <y>560</y>
+     <x>815</x>
+     <y>582</y>
     </hint>
     <hint type="destinationlabel">
      <x>668</x>
@@ -696,8 +752,25 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>resetButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onReset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>793</x>
+     <y>293</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>728</x>
+     <y>603</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onSend()</slot>
+  <slot>onReset()</slot>
  </slots>
 </ui>

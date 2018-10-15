@@ -110,7 +110,26 @@ void MainWindow::onSend() {
       // never happens
       break;
     }
-    data.append('\n');
+
+    switch (lineEndingComboBox->currentIndex()) {
+    case 0:
+      // lf
+      data.append('\n');
+      break;
+    case 1:
+      // cr lf
+      data.append('\r');
+      data.append('\n');
+      break;
+    case 2:
+      // cr
+      data.append('\r');
+      break;
+    default:
+      // none
+      break;
+    }
+
     if (echoCheckBox->isChecked()) {
       appendText(text, "green");
     }
@@ -184,4 +203,15 @@ void MainWindow::appendText(QString text, QString color) {
   textBrowser->setHtml(textBrowser->toHtml() + text);
   textBrowser->verticalScrollBar()->setValue(
       textBrowser->verticalScrollBar()->maximum());
+}
+
+void MainWindow::onReset() {
+  bytesRecv = 0;
+  bytesRecvLabel->setText("0");
+  bytesSent = 0;
+  bytesSentLabel->setText("0");
+  recvRecord.clear();
+  recvSpeedLabel->setText("0");
+  sentRecord.clear();
+  sentSpeedLabel->setText("0");
 }
