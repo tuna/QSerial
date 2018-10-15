@@ -33,7 +33,6 @@ void SerialPortQt::sendData(const QByteArray &data) { port->write(data); }
 void SerialPortQt::handleReadyRead() {
   while (port->bytesAvailable()) {
     auto data = port->readAll();
-    qWarning() << "SerailPortQt" << data;
     emit receivedData(data);
   }
 }

@@ -22,6 +22,7 @@ void SerialPortCP210X::setBaudRate(qint32 baudRate) {
   auto rc = libusb_control_transfer(handle, 0b01000001, 0x1E, 0, 0,
                                     (unsigned char *)&baudRate,
                                     sizeof(baudRate), 300);
+  Q_ASSERT(rc == 0);
 }
 void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
   uint16_t lineCtl;
@@ -29,12 +30,14 @@ void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
   auto rc =
       libusb_control_transfer(handle, 0b11000001, 0x04, 0, 0,
                               (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
   const uint16_t mapping[] = {0, 65535, 2,
                               1, 4,     3}; // No, Even, Odd, Space, Mark
   lineCtl = (lineCtl & 0b1111111100001111) | (mapping[parity] << 4);
   // SET_LINE_CTL
   rc = libusb_control_transfer(handle, 0b01000001, 0x03, 0, 0,
                                (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
 }
 void SerialPortCP210X::setDataBits(QSerialPort::DataBits dataBits) {
   uint16_t lineCtl;
@@ -42,10 +45,12 @@ void SerialPortCP210X::setDataBits(QSerialPort::DataBits dataBits) {
   auto rc =
       libusb_control_transfer(handle, 0b11000001, 0x04, 0, 0,
                               (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
   lineCtl = (lineCtl & 0b0000000011111111) | (dataBits << 8);
   // SET_LINE_CTL
   rc = libusb_control_transfer(handle, 0b01000001, 0x03, 0, 0,
                                (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
 }
 void SerialPortCP210X::setStopBits(QSerialPort::StopBits stopBits) {
   uint16_t lineCtl;
@@ -53,14 +58,17 @@ void SerialPortCP210X::setStopBits(QSerialPort::StopBits stopBits) {
   auto rc =
       libusb_control_transfer(handle, 0b11000001, 0x04, 0, 0,
                               (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
   const uint16_t mapping[] = {65535, 0, 2, 1}; // One, Two, OneAndHalf
   lineCtl = (lineCtl & 0b1111111111110000) | mapping[stopBits];
   // SET_LINE_CTL
   rc = libusb_control_transfer(handle, 0b01000001, 0x03, 0, 0,
                                (unsigned char *)&lineCtl, sizeof(lineCtl), 300);
+  Q_ASSERT(rc == 0);
 }
 void SerialPortCP210X::setFlowControl(QSerialPort::FlowControl flowControl) {
   // not implemented yet
+  Q_UNUSED(flowControl);
 }
 bool SerialPortCP210X::open() {
   auto rc = libusb_open(device, &handle);
@@ -113,7 +121,7 @@ QList<SerialPort *> SerialPortCP210X::availablePorts(QObject *parent) {
   auto count = libusb_get_device_list(context, &list);
   for (auto i = 0; i < count; i++) {
     auto device = list[i];
-    libusb_device_descriptor desc = {0};
+    libusb_device_descriptor desc = {};
     auto rc = libusb_get_device_descriptor(device, &desc);
     if (rc == 0) {
       for (auto dev : supportedDevices) {

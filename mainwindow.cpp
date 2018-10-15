@@ -1,10 +1,12 @@
 #include "mainwindow.h"
+#include "libusb.h"
 #include "serialport.h"
 #include <QDateTime>
 #include <QDebug>
 #include <QScrollBar>
 #include <QSerialPortInfo>
 #include <QTextCodec>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setupUi(this);
@@ -19,6 +21,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
   bytesRecv = 0;
   bytesSent = 0;
+
+  timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(onIdle()));
+  timer->start(100);
 }
 
 inline int fromHex(char ch) {
@@ -49,10 +55,13 @@ void MainWindow::onSend() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
   if (!serialPort->isOpen()) {
     if (serialPort->open()) {
-      statusBar()->showMessage(
-          tr("%1 %2 Open")
-              .arg(serialPort->portName())
-              .arg(baudRateComboBox->currentText().toInt()));
+      statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
+                                   .arg(serialPort->portName())
+                                   .arg(baudRateComboBox->currentText().toInt())
+                                   .arg(dataBitsComboBox->currentText())
+                                   .arg(parityComboBox->currentText())
+                                   .arg(stopBitsComboBox->currentText())
+                                   .arg(flowControlComboBox->currentText()));
     } else {
       statusBar()->showMessage("Failed");
       return;
@@ -228,14 +237,7 @@ void MainWindow::onDataReceived(QByteArray data) {
 
 void MainWindow::appendText(QString text, QColor color) {
   textBrowser->setTextColor(color);
-  /*
-  text = QString("<font color=\"%1\">%2</font>")
-             .arg(color)
-             .arg(text.toHtmlEscaped().replace("\n","<br>"));
-  qWarning() << text;
-  */
   textBrowser->insertPlainText(text);
-  //textBrowser->setHtml(textBrowser->toHtml() + text);
   textBrowser->verticalScrollBar()->setValue(
       textBrowser->verticalScrollBar()->maximum());
 }
@@ -249,4 +251,9 @@ void MainWindow::onReset() {
   recvSpeedLabel->setText("0");
   sentRecord.clear();
   sentSpeedLabel->setText("0");
+}
+
+void MainWindow::onIdle() {
+  struct timeval tv = {};
+  libusb_handle_events_timeout_completed(context, &tv, nullptr);
 }

@@ -17,6 +17,7 @@ private slots:
   void onSend();
   void onReset();
   void onDataReceived(QByteArray data);
+  void onIdle();
 
 private:
   QList<SerialPort *> ports;
@@ -26,6 +27,7 @@ private:
   quint64 bytesSent;
   QList<QPair<quint64, qint64>> recvRecord;
   QList<QPair<quint64, qint64>> sentRecord;
+  QTimer *timer;
 };
 
 #endif
