@@ -47,6 +47,18 @@ inline QString toHumanRate(quint64 rate) {
 
 void MainWindow::onSend() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
+  if (!serialPort->isOpen()) {
+    if (serialPort->open()) {
+      statusBar()->showMessage(
+          tr("%1 %2 Open")
+              .arg(serialPort->portName())
+              .arg(baudRateComboBox->currentText().toInt()));
+    } else {
+      statusBar()->showMessage("Failed");
+      return;
+    }
+  }
+
   serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
   serialPort->setDataBits(
       (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
@@ -58,120 +70,109 @@ void MainWindow::onSend() {
       (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
   serialPort->setFlowControl(
       (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
-  if (!serialPort->isOpen()) {
-    if (serialPort->open()) {
-      statusBar()->showMessage(
-          tr("%1 %2 Open")
-              .arg(serialPort->portName())
-              .arg(baudRateComboBox->currentText().toInt()));
-    } else {
-      statusBar()->showMessage("Failed");
-    }
-  }
-  if (serialPort->isOpen()) {
-    auto text = inputPlainTextEdit->toPlainText();
-    auto codec = QTextCodec::codecForName("UTF-8");
-    auto textData = codec->fromUnicode(text);
-    QByteArray data;
-    bool isFirst;
-    int currentByte;
-    switch (sendParseAsComboBox->currentIndex()) {
-    case 0:
-      // text
-      data = textData;
-      break;
-    case 1:
-      // hex
-      isFirst = true;
-      currentByte = 0;
-      for (auto ch : textData) {
-        if (ch == ' ' || ch == '\r' || ch == '\n') {
-          continue;
-        }
-        if (ch == 'x' || ch == 'X') {
-          if (isFirst == false && currentByte == 0) {
-            // 0x
-            isFirst = true;
-            continue;
-          } else {
-            // fail
-            break;
-          }
-        }
-        int cur = fromHex(ch);
-        if (cur == -1) {
-          statusBar()->showMessage("Invalid hex");
-          return;
-        }
-        if (isFirst) {
-          currentByte = cur;
-          isFirst = false;
-        } else {
-          currentByte = (currentByte << 4) + cur;
-          data.append(currentByte);
+
+  auto text = inputPlainTextEdit->toPlainText();
+  auto codec = QTextCodec::codecForName("UTF-8");
+  auto textData = codec->fromUnicode(text);
+  QByteArray data;
+  bool isFirst;
+  int currentByte;
+  switch (sendParseAsComboBox->currentIndex()) {
+  case 0:
+    // text
+    data = textData;
+    break;
+  case 1:
+    // hex
+    isFirst = true;
+    currentByte = 0;
+    for (auto ch : textData) {
+      if (ch == ' ' || ch == '\r' || ch == '\n') {
+        continue;
+      }
+      if (ch == 'x' || ch == 'X') {
+        if (isFirst == false && currentByte == 0) {
+          // 0x
           isFirst = true;
+          continue;
+        } else {
+          // fail
+          break;
         }
       }
-      if (!isFirst) {
+      int cur = fromHex(ch);
+      if (cur == -1) {
         statusBar()->showMessage("Invalid hex");
         return;
       }
-      break;
-    case 2:
-      // base64
-      data = QByteArray::fromBase64(textData);
-      break;
-    case 3:
-      // percent encoding
-      data = QByteArray::fromPercentEncoding(textData);
-      break;
-    default:
-      // never happens
-      break;
-    }
-
-    switch (lineEndingComboBox->currentIndex()) {
-    case 0:
-      // lf
-      data.append('\n');
-      break;
-    case 1:
-      // cr lf
-      data.append('\r');
-      data.append('\n');
-      break;
-    case 2:
-      // cr
-      data.append('\r');
-      break;
-    default:
-      // none
-      break;
-    }
-
-    if (echoCheckBox->isChecked()) {
-      if (sendShowTimeCheckBox->isChecked()) {
-        text = QString("[%1] %2")
-                   .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-                   .arg(text);
+      if (isFirst) {
+        currentByte = cur;
+        isFirst = false;
+      } else {
+        currentByte = (currentByte << 4) + cur;
+        data.append(currentByte);
+        isFirst = true;
       }
-      appendText(text, "green");
     }
-    serialPort->sendData(data);
-
-    bytesSent += data.length();
-    bytesSentLabel->setText(QString("%1").arg(bytesSent));
-    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-    sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-    while (sentRecord.first().second < currentTime - 1000) {
-      sentRecord.pop_front();
+    if (!isFirst) {
+      statusBar()->showMessage("Invalid hex");
+      return;
     }
-    quint64 speed = 0;
-    for (auto pair : sentRecord) {
-      speed += pair.first;
-    }
-    sentSpeedLabel->setText(toHumanRate(speed));
+    break;
+  case 2:
+    // base64
+    data = QByteArray::fromBase64(textData);
+    break;
+  case 3:
+    // percent encoding
+    data = QByteArray::fromPercentEncoding(textData);
+    break;
+  default:
+    // never happens
+    break;
   }
+
+  switch (lineEndingComboBox->currentIndex()) {
+  case 0:
+    // lf
+    data.append('\n');
+    break;
+  case 1:
+    // cr lf
+    data.append('\r');
+    data.append('\n');
+    break;
+  case 2:
+    // cr
+    data.append('\r');
+    break;
+  default:
+    // none
+    break;
+  }
+
+  if (echoCheckBox->isChecked()) {
+    if (sendShowTimeCheckBox->isChecked()) {
+      text = QString("[%1] %2")
+                 .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+                 .arg(text);
+    }
+    appendText(text, Qt::green);
+  }
+  serialPort->sendData(data);
+
+  bytesSent += data.length();
+  bytesSentLabel->setText(QString("%1").arg(bytesSent));
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
+  while (sentRecord.first().second < currentTime - 1000) {
+    sentRecord.pop_front();
+  }
+  quint64 speed = 0;
+  for (auto pair : sentRecord) {
+    speed += pair.first;
+  }
+  sentSpeedLabel->setText(toHumanRate(speed));
 }
 
 inline char toHex(int value) {
@@ -222,14 +223,19 @@ void MainWindow::onDataReceived(QByteArray data) {
                .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
                .arg(text);
   }
-  appendText(text, "red");
+  appendText(text, Qt::red);
 }
 
-void MainWindow::appendText(QString text, QString color) {
+void MainWindow::appendText(QString text, QColor color) {
+  textBrowser->setTextColor(color);
+  /*
   text = QString("<font color=\"%1\">%2</font>")
              .arg(color)
-             .arg(text.toHtmlEscaped());
-  textBrowser->setHtml(textBrowser->toHtml() + text);
+             .arg(text.toHtmlEscaped().replace("\n","<br>"));
+  qWarning() << text;
+  */
+  textBrowser->insertPlainText(text);
+  //textBrowser->setHtml(textBrowser->toHtml() + text);
   textBrowser->verticalScrollBar()->setValue(
       textBrowser->verticalScrollBar()->maximum());
 }

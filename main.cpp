@@ -1,11 +1,15 @@
+#include "libusb.h"
 #include "mainwindow.h"
 #include <QApplication>
 
 int main(int argc, char *argv[]) {
-    QApplication app(argc, argv);
+  auto rc = libusb_init(&context);
+  assert(rc == 0);
 
-    MainWindow mw;
-    mw.show();
+  QApplication app(argc, argv);
 
-    return app.exec();
+  MainWindow mw;
+  mw.show();
+
+  return app.exec();
 }
