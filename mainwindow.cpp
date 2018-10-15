@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "serialport.h"
+#include <QDateTime>
 #include <QDebug>
 #include <QScrollBar>
 #include <QSerialPortInfo>
@@ -15,6 +16,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(port, SIGNAL(receivedData(QByteArray)), this,
             SLOT(onDataReceived(QByteArray)));
   }
+
+  bytesRecv = 0;
+  bytesSent = 0;
 }
 
 inline int fromHex(char ch) {
@@ -26,6 +30,18 @@ inline int fromHex(char ch) {
     return ch - 'A' + 10;
   } else {
     return -1;
+  }
+}
+
+inline QString toHumanRate(quint64 rate) {
+  if (rate < 1024) {
+    return QString("%1 B/s").arg(rate);
+  } else if (1024 <= rate && rate < 1024 * 1024) {
+    return QString("%1 KiB/s").arg(1.0 * rate / 1024, 0, 'f', 2);
+  } else if (1024 * 1024 <= rate && rate < 1024 * 1024 * 1024) {
+    return QString("%1 MiB/s").arg(1.0 * rate / 1024 / 1024, 0, 'f', 2);
+  } else {
+    return "really??";
   }
 }
 
@@ -99,6 +115,19 @@ void MainWindow::onSend() {
       appendText(text, "green");
     }
     serialPort->sendData(data);
+
+    bytesSent += data.length();
+    bytesSentLabel->setText(QString("%1").arg(bytesSent));
+    qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+    sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
+    while (sentRecord.first().second < currentTime - 1000) {
+      sentRecord.pop_front();
+    }
+    quint64 speed = 0;
+    for (auto pair : sentRecord) {
+      speed += pair.first;
+    }
+    sentSpeedLabel->setText(toHumanRate(speed));
   }
 }
 
@@ -113,6 +142,19 @@ inline char toHex(int value) {
 }
 
 void MainWindow::onDataReceived(QByteArray data) {
+  bytesRecv += data.length();
+  bytesRecvLabel->setText(QString("%1").arg(bytesRecv));
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  recvRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
+  while (recvRecord.first().second < currentTime - 1000) {
+    recvRecord.pop_front();
+  }
+  quint64 speed = 0;
+  for (auto pair : recvRecord) {
+    speed += pair.first;
+  }
+  recvSpeedLabel->setText(toHumanRate(speed));
+
   QString text;
   auto codec = QTextCodec::codecForName("UTF-8");
   switch (recvShowAsComboBox->currentIndex()) {
@@ -135,8 +177,10 @@ void MainWindow::onDataReceived(QByteArray data) {
   appendText(text, "red");
 }
 
-void MainWindow::appendText(QString text, QString color){ 
-  text = QString("<font color=\"%1\">%2</font>").arg(color).arg(text.toHtmlEscaped());
+void MainWindow::appendText(QString text, QString color) {
+  text = QString("<font color=\"%1\">%2</font>")
+             .arg(color)
+             .arg(text.toHtmlEscaped());
   textBrowser->setHtml(textBrowser->toHtml() + text);
   textBrowser->verticalScrollBar()->setValue(
       textBrowser->verticalScrollBar()->maximum());

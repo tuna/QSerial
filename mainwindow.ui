@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>750</width>
+    <width>884</width>
     <height>639</height>
    </rect>
   </property>
@@ -517,7 +517,7 @@
      <rect>
       <x>240</x>
       <y>480</y>
-      <width>381</width>
+      <width>501</width>
       <height>91</height>
      </rect>
     </property>
@@ -525,7 +525,7 @@
    <widget class="QPushButton" name="sendButton">
     <property name="geometry">
      <rect>
-      <x>630</x>
+      <x>750</x>
       <y>490</y>
       <width>114</width>
       <height>71</height>
@@ -535,13 +535,143 @@
      <string>Send</string>
     </property>
    </widget>
+   <widget class="QGroupBox" name="groupBox_4">
+    <property name="geometry">
+     <rect>
+      <x>750</x>
+      <y>30</y>
+      <width>121</width>
+      <height>441</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string>Statistics</string>
+    </property>
+    <widget class="QLabel" name="label_8">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>30</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Bytes Sent:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bytesSentLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>50</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_10">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>80</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Bytes Recv:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="bytesRecvLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>100</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_12">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>101</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Recv Speed:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="recvSpeedLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>150</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="label_14">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>180</y>
+       <width>81</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Send Speed:</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="sentSpeedLabel">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>200</y>
+       <width>59</width>
+       <height>16</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>0</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="resetButton">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>230</y>
+       <width>114</width>
+       <height>32</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Reset</string>
+     </property>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>750</width>
+     <width>884</width>
      <height>22</height>
     </rect>
    </property>
