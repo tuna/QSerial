@@ -121,6 +121,10 @@ void MainWindow::onSend() {
       // base64
       data = QByteArray::fromBase64(textData);
       break;
+    case 3:
+      // percent encoding
+      data = QByteArray::fromPercentEncoding(textData);
+      break;
     default:
       // never happens
       break;

@@ -512,6 +512,11 @@
           <string>Base64</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Percent Encoding</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
