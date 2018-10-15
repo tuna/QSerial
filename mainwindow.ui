@@ -456,7 +456,22 @@
            <widget class="QComboBox" name="recvShowAsComboBox">
             <item>
              <property name="text">
-              <string>Text</string>
+              <string>Text (UTF-8)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (Big5)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (GB18030)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (Shift-JIS)</string>
              </property>
             </item>
             <item>
@@ -540,7 +555,22 @@
            <widget class="QComboBox" name="sendParseAsComboBox">
             <item>
              <property name="text">
-              <string>Text</string>
+              <string>Text (UTF-8)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (Big5)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (GB18030)</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>Text (Shift-JIS)</string>
              </property>
             </item>
             <item>

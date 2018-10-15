@@ -88,10 +88,25 @@ void MainWindow::onSend() {
   int currentByte;
   switch (sendParseAsComboBox->currentIndex()) {
   case 0:
-    // text
+    // text utf-8
     data = textData;
     break;
   case 1:
+    // text big5
+    codec = QTextCodec::codecForName("Big5");
+    data = codec->fromUnicode(text);
+    break;
+  case 2:
+    // text gb18030
+    codec = QTextCodec::codecForName("GB18030");
+    data = codec->fromUnicode(text);
+    break;
+  case 3:
+    // text shift-jis
+    codec = QTextCodec::codecForName("Shift-JIS");
+    data = codec->fromUnicode(text);
+    break;
+  case 4:
     // hex
     isFirst = true;
     currentByte = 0;
@@ -128,11 +143,11 @@ void MainWindow::onSend() {
       return;
     }
     break;
-  case 2:
+  case 5:
     // base64
     data = QByteArray::fromBase64(textData);
     break;
-  case 3:
+  case 6:
     // percent encoding
     data = QByteArray::fromPercentEncoding(textData);
     break;
@@ -209,13 +224,29 @@ void MainWindow::onDataReceived(QByteArray data) {
   recvSpeedLabel->setText(toHumanRate(speed));
 
   QString text;
-  auto codec = QTextCodec::codecForName("UTF-8");
+  QTextCodec *codec;
   switch (recvShowAsComboBox->currentIndex()) {
   case 0:
-    // text
+    // text utf-8
+    codec = QTextCodec::codecForName("UTF-8");
     text = codec->toUnicode(data);
     break;
   case 1:
+    // text big5
+    codec = QTextCodec::codecForName("Big5");
+    text = codec->toUnicode(data);
+    break;
+  case 2:
+    // text gb18030
+    codec = QTextCodec::codecForName("GB18030");
+    text = codec->toUnicode(data);
+    break;
+  case 3:
+    // text shift-jis
+    codec = QTextCodec::codecForName("Shift-JIS");
+    text = codec->toUnicode(data);
+    break;
+  case 4:
     // hex
     for (auto byte : data) {
       text += toHex((byte & 0xF0) >> 4);
