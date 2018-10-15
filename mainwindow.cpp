@@ -96,9 +96,7 @@ void MainWindow::onSend() {
     }
     data.append('\n');
     if (echoCheckBox->isChecked()) {
-      textBrowser->setPlainText(textBrowser->toPlainText() + text);
-      textBrowser->verticalScrollBar()->setValue(
-          textBrowser->verticalScrollBar()->maximum());
+      appendText(text, "green");
     }
     serialPort->sendData(data);
   }
@@ -134,7 +132,12 @@ void MainWindow::onDataReceived(QByteArray data) {
     // never happens
     break;
   }
-  textBrowser->setPlainText(textBrowser->toPlainText() + text);
+  appendText(text, "red");
+}
+
+void MainWindow::appendText(QString text, QString color){ 
+  text = QString("<font color=\"%1\">%2</font>").arg(color).arg(text.toHtmlEscaped());
+  textBrowser->setHtml(textBrowser->toHtml() + text);
   textBrowser->verticalScrollBar()->setValue(
       textBrowser->verticalScrollBar()->maximum());
 }

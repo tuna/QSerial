@@ -19,6 +19,7 @@ private slots:
 
 private:
   QList<SerialPort *> ports;
+  void appendText(QString text, QString color);
 };
 
 #endif
