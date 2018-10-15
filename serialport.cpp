@@ -1,5 +1,6 @@
 #include "serialport.h"
 #include "serialportqt.h"
+#include "serialportdummy.h"
 #include <QSerialPortInfo>
 
 SerialPort::SerialPort(QObject *parent) : QObject(parent) {}
@@ -10,6 +11,7 @@ QList<SerialPort *> SerialPort::getAvailablePorts(QObject *parent) {
   for (auto port : ports) {
     result.append(new SerialPortQt(parent, port.portName()));
   }
+  result.append(new SerialPortDummy(parent));
 
   return result;
 }
