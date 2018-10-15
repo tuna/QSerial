@@ -439,17 +439,17 @@
       </item>
      </layout>
     </widget>
-    <widget class="QCheckBox" name="echoCheckBox">
+    <widget class="QCheckBox" name="recvShowTimeCheckBox">
      <property name="geometry">
       <rect>
        <x>10</x>
        <y>70</y>
-       <width>87</width>
+       <width>111</width>
        <height>20</height>
       </rect>
      </property>
      <property name="text">
-      <string>Echo</string>
+      <string>Show Time</string>
      </property>
     </widget>
    </widget>
@@ -566,6 +566,32 @@
        </widget>
       </item>
      </layout>
+    </widget>
+    <widget class="QCheckBox" name="sendShowTimeCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>110</y>
+       <width>111</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Show Time</string>
+     </property>
+    </widget>
+    <widget class="QCheckBox" name="echoCheckBox">
+     <property name="geometry">
+      <rect>
+       <x>120</x>
+       <y>110</y>
+       <width>87</width>
+       <height>20</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Echo</string>
+     </property>
     </widget>
    </widget>
    <widget class="QPlainTextEdit" name="inputPlainTextEdit">

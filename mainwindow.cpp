@@ -131,6 +131,11 @@ void MainWindow::onSend() {
     }
 
     if (echoCheckBox->isChecked()) {
+      if (sendShowTimeCheckBox->isChecked()) {
+        text = QString("[%1] %2")
+                   .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+                   .arg(text);
+      }
       appendText(text, "green");
     }
     serialPort->sendData(data);
@@ -192,6 +197,11 @@ void MainWindow::onDataReceived(QByteArray data) {
   default:
     // never happens
     break;
+  }
+  if (recvShowTimeCheckBox->isChecked()) {
+    text = QString("[%1] %2")
+                .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+                .arg(text);
   }
   appendText(text, "red");
 }
