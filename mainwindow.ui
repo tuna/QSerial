@@ -507,6 +507,11 @@
           <string>Hex</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>Base64</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -621,9 +626,9 @@
     <property name="geometry">
      <rect>
       <x>750</x>
-      <y>30</y>
+      <y>10</y>
       <width>121</width>
-      <height>441</height>
+      <height>461</height>
      </rect>
     </property>
     <property name="title">

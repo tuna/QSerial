@@ -69,21 +69,22 @@ void MainWindow::onSend() {
     }
   }
   if (serialPort->isOpen()) {
-    QString text = inputPlainTextEdit->toPlainText();
+    auto text = inputPlainTextEdit->toPlainText();
     auto codec = QTextCodec::codecForName("UTF-8");
+    auto textData = codec->fromUnicode(text);
     QByteArray data;
     bool isFirst;
     int currentByte;
     switch (sendParseAsComboBox->currentIndex()) {
     case 0:
       // text
-      data = codec->fromUnicode(text);
+      data = textData;
       break;
     case 1:
       // hex
       isFirst = true;
       currentByte = 0;
-      for (auto ch : codec->fromUnicode(text)) {
+      for (auto ch : textData) {
         if (ch == ' ' || ch == '\r' || ch == '\n') {
           continue;
         }
@@ -105,6 +106,10 @@ void MainWindow::onSend() {
         statusBar()->showMessage("Invalid hex");
         return;
       }
+      break;
+    case 2:
+      // base64
+      data = QByteArray::fromBase64(textData);
       break;
     default:
       // never happens
@@ -200,8 +205,8 @@ void MainWindow::onDataReceived(QByteArray data) {
   }
   if (recvShowTimeCheckBox->isChecked()) {
     text = QString("[%1] %2")
-                .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-                .arg(text);
+               .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
+               .arg(text);
   }
   appendText(text, "red");
 }
