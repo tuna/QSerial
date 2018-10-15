@@ -96,6 +96,9 @@
         <property name="editable">
          <bool>true</bool>
         </property>
+        <property name="currentIndex">
+         <number>7</number>
+        </property>
         <item>
          <property name="text">
           <string>1200</string>
@@ -136,6 +139,11 @@
           <string>115200</string>
          </property>
         </item>
+        <item>
+         <property name="text">
+          <string>230400</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -172,6 +180,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="dataBitsComboBox">
+        <property name="currentIndex">
+         <number>3</number>
+        </property>
         <item>
          <property name="text">
           <string>5</string>

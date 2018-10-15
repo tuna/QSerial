@@ -1,22 +1,24 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include "serialport.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
-#include <QWidget>
 #include <QSerialPort>
+#include <QWidget>
 
 class MainWindow : public QMainWindow, private Ui::MainWindow {
-    Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+  explicit MainWindow(QWidget *parent = nullptr);
 
 private slots:
-    void onSend();
+  void onSend();
+  void onDataReceived(QByteArray data);
 
 private:
-    QSerialPort *serialPort;
+  QList<SerialPort *> ports;
 };
 
 #endif
