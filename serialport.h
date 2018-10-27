@@ -21,9 +21,11 @@ public:
 
 signals:
   void receivedData(QByteArray data);
+  void breakChanged(bool set);
 
 public slots:
   virtual void sendData(const QByteArray &data) = 0;
+  virtual void triggerBreak(uint msecs) = 0;
 
 protected:
   SerialPort(QObject *parent = nullptr);

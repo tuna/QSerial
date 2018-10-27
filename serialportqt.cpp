@@ -7,6 +7,7 @@ SerialPortQt::SerialPortQt(QObject *parent, QString portName)
   port = new QSerialPort(this);
   port->setPortName(portName);
   connect(port, SIGNAL(readyRead()), this, SLOT(handleReadyRead()));
+  breakTimer = nullptr;
 }
 
 SerialPortQt::~SerialPortQt() { delete port; }
@@ -43,4 +44,22 @@ QList<SerialPort *> SerialPortQt::availablePorts(QObject *parent) {
     result.append(new SerialPortQt(parent, port.portName()));
   }
   return result;
+}
+
+void SerialPortQt::triggerBreak(uint msecs) {
+  port->setBreakEnabled(true);
+  qWarning() << "Enabled";
+  if (breakTimer) {
+    breakTimer->stop();
+    delete breakTimer;
+  }
+  breakTimer = new QTimer(this);
+  breakTimer->setSingleShot(true);
+  connect(breakTimer, SIGNAL(timeout()), this, SLOT(breakTimeout()));
+  breakTimer->start(msecs);
+}
+
+void SerialPortQt::breakTimeout() {
+  port->setBreakEnabled(false);
+  qWarning() << "Disabled";
 }

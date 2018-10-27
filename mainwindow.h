@@ -20,6 +20,8 @@ private slots:
   void onIdle();
   void onOpen();
   void onClose();
+  void onBreak();
+  void onBreakChanged(bool set);
 
 private:
   QList<SerialPort *> ports;

@@ -2,12 +2,15 @@
 #include <QDebug>
 #include <QVector>
 
+const unsigned short ESCAPE_CHAR = 0x1e;
+
 SerialPortCP210X::SerialPortCP210X(QObject *parent, libusb_device *device)
     : SerialPort(parent) {
   libusb_ref_device(device);
   this->device = device;
   handle = nullptr;
   thread = nullptr;
+  breakTimer = nullptr;
 }
 
 SerialPortCP210X::~SerialPortCP210X() { libusb_unref_device(device); }
@@ -73,8 +76,24 @@ void SerialPortCP210X::setFlowControl(QSerialPort::FlowControl flowControl) {
 bool SerialPortCP210X::open() {
   auto rc = libusb_open(device, &handle);
   if (rc == 0) {
-    libusb_detach_kernel_driver(handle, 0);
-    libusb_claim_interface(handle, 0);
+    rc = libusb_detach_kernel_driver(handle, 0);
+    Q_ASSERT(rc == 0);
+    rc = libusb_set_configuration(handle, 0);
+    Q_ASSERT(rc == 0);
+    rc = libusb_claim_interface(handle, 0);
+    Q_ASSERT(rc == 0);
+
+    // IFC_ENABLE
+    auto rc = libusb_control_transfer(handle, 0b01000001, 0x00, 1, 0,
+                                      nullptr, 0, 300);
+    Q_ASSERT(rc == 0);
+
+    // FIXME: BREAK recv not working yet
+    // EMBED_EVENTS
+    rc = libusb_control_transfer(handle, 0b01000001, 0x15, ESCAPE_CHAR, 0,
+                                      nullptr, 0, 300);
+    Q_ASSERT(rc == 0);
+
     thread = QThread::create([this] {
       char data[64] = {0};
       int len = 0;
@@ -135,4 +154,27 @@ QList<SerialPort *> SerialPortCP210X::availablePorts(QObject *parent) {
   }
   libusb_free_device_list(list, true);
   return result;
+}
+
+void SerialPortCP210X::triggerBreak(uint msecs) {
+  // SET_BREAK
+  auto rc =
+      libusb_control_transfer(handle, 0b01000001, 0x05, 1, 0, nullptr, 0, 300);
+  Q_ASSERT(rc == 0);
+
+  if (breakTimer) {
+    breakTimer->stop();
+    delete breakTimer;
+  }
+  breakTimer = new QTimer(this);
+  breakTimer->setSingleShot(true);
+  connect(breakTimer, SIGNAL(timeout()), this, SLOT(breakTimeout()));
+  breakTimer->start(msecs);
+}
+
+void SerialPortCP210X::breakTimeout() {
+  // SET_BREAK
+  auto rc =
+      libusb_control_transfer(handle, 0b01000001, 0x05, 0, 0, nullptr, 0, 300);
+  Q_ASSERT(rc == 0);
 }

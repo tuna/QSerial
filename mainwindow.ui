@@ -674,6 +674,39 @@
           <string>Echo</string>
          </property>
         </widget>
+        <widget class="QWidget" name="">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>140</y>
+           <width>201</width>
+           <height>33</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_12">
+          <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Duration:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="breakDurationLineEdit">
+            <property name="placeholderText">
+             <string>ms</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton">
+            <property name="text">
+             <string>BREAK</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </widget>
       </item>
      </layout>
@@ -956,11 +989,28 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onBreak()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>188</x>
+     <y>678</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>725</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onSend()</slot>
   <slot>onReset()</slot>
   <slot>onOpen()</slot>
   <slot>onClose()</slot>
+  <slot>onBreak()</slot>
  </slots>
 </ui>

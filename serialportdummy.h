@@ -22,9 +22,11 @@ public:
 
 signals:
   void receivedData(QByteArray data);
+  void breakChanged(bool set);
 
 public slots:
   void sendData(const QByteArray &data) override { emit receivedData(data); }
+  void triggerBreak(uint msecs) override { Q_UNUSED(msecs); };
 
 private:
   SerialPortDummy(QObject *parent = nullptr) : SerialPort(parent) {

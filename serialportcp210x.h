@@ -4,6 +4,10 @@
 #include "libusb.h"
 #include "serialport.h"
 #include <QThread>
+#include <QTimer>
+
+// reference:
+// https://www.silabs.com/documents/public/application-notes/AN571.pdf
 
 class SerialPortCP210X : public SerialPort {
   Q_OBJECT
@@ -22,9 +26,14 @@ public:
 
 signals:
   void receivedData(QByteArray data);
+  void breakChanged(bool set);
 
 public slots:
   void sendData(const QByteArray &data) override;
+  void triggerBreak(uint msecs) override;
+
+private slots:
+  void breakTimeout();
 
 private:
   SerialPortCP210X(QObject *parent = nullptr, libusb_device *device = nullptr);
@@ -32,6 +41,7 @@ private:
   libusb_device *device;
   libusb_device_handle *handle;
   QThread *thread;
+  QTimer *breakTimer;
 };
 
 #endif

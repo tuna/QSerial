@@ -17,6 +17,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     serialPortComboBox->addItem(port->portName());
     connect(port, SIGNAL(receivedData(QByteArray)), this,
             SLOT(onDataReceived(QByteArray)));
+    connect(port, SIGNAL(breakChanged(bool)), this,
+            SLOT(onBreakChanged(bool)));
   }
 
   bytesRecv = 0;
@@ -304,5 +306,19 @@ void MainWindow::onClose() {
   if (serialPort->isOpen()) {
     serialPort->close();
     statusBar()->showMessage("");
+  }
+}
+
+void MainWindow::onBreak() {
+  auto serialPort = ports[serialPortComboBox->currentIndex()];
+  uint time = breakDurationLineEdit->text().toInt();
+  serialPort->triggerBreak(time);
+}
+
+void MainWindow::onBreakChanged(bool set) {
+  if (set) {
+    appendText("BREAK ON", Qt::blue);
+  } else {
+    appendText("BREAK OFF", Qt::blue);
   }
 }

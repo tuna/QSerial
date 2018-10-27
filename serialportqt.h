@@ -2,6 +2,7 @@
 #define SERIALPORTQT_H
 
 #include "serialport.h"
+#include <QTimer>
 
 class SerialPortQt : public SerialPort {
   Q_OBJECT
@@ -20,17 +21,21 @@ public:
 
 signals:
   void receivedData(QByteArray data);
+  void breakChanged(bool set); // not supported
 
 public slots:
   void sendData(const QByteArray &data) override;
+  void triggerBreak(uint msecs) override;
 
 private slots:
   void handleReadyRead();
+  void breakTimeout();
 
 private:
   SerialPortQt(QObject *parent = nullptr, QString portName = "");
   ~SerialPortQt();
   QSerialPort *port;
+  QTimer *breakTimer;
 };
 
 #endif
