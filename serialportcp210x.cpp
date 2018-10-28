@@ -84,14 +84,14 @@ bool SerialPortCP210X::open() {
     Q_ASSERT(rc == 0);
 
     // IFC_ENABLE
-    auto rc = libusb_control_transfer(handle, 0b01000001, 0x00, 1, 0,
-                                      nullptr, 0, 300);
+    auto rc = libusb_control_transfer(handle, 0b01000001, 0x00, 1, 0, nullptr,
+                                      0, 300);
     Q_ASSERT(rc == 0);
 
     // FIXME: BREAK recv not working yet
     // EMBED_EVENTS
     rc = libusb_control_transfer(handle, 0b01000001, 0x15, ESCAPE_CHAR, 0,
-                                      nullptr, 0, 300);
+                                 nullptr, 0, 300);
     Q_ASSERT(rc == 0);
 
     thread = QThread::create([this] {
@@ -116,7 +116,7 @@ void SerialPortCP210X::close() {
   libusb_close(handle);
   handle = nullptr;
 }
-void callback(libusb_transfer *transfer) {
+void cp210x_callback(libusb_transfer *transfer) {
   delete (unsigned char *)transfer->user_data;
   libusb_free_transfer(transfer);
 }
@@ -127,12 +127,12 @@ void SerialPortCP210X::sendData(const QByteArray &data) {
   memcpy(buffer, data.data(), data.length());
 
   libusb_fill_bulk_transfer(transfer, handle, 0x01, buffer, data.length(),
-                            callback, buffer, 0);
+                            cp210x_callback, buffer, 0);
   libusb_submit_transfer(transfer);
 }
 
-QVector<QPair<quint16, quint16>> supportedDevices = {{0x10C4, 0xEA60},
-                                                     {0x10C4, 0xEA70}};
+QVector<QPair<quint16, quint16>> supportedCP210XDevices = {{0x10C4, 0xEA60},
+                                                           {0x10C4, 0xEA70}};
 
 QList<SerialPort *> SerialPortCP210X::availablePorts(QObject *parent) {
   QList<SerialPort *> result;
@@ -143,7 +143,7 @@ QList<SerialPort *> SerialPortCP210X::availablePorts(QObject *parent) {
     libusb_device_descriptor desc = {};
     auto rc = libusb_get_device_descriptor(device, &desc);
     if (rc == 0) {
-      for (auto dev : supportedDevices) {
+      for (auto dev : supportedCP210XDevices) {
         if (dev.first == desc.idVendor && dev.second == desc.idProduct) {
           // found
           result.append(new SerialPortCP210X(parent, device));
