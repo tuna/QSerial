@@ -17,8 +17,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     serialPortComboBox->addItem(port->portName());
     connect(port, SIGNAL(receivedData(QByteArray)), this,
             SLOT(onDataReceived(QByteArray)));
-    connect(port, SIGNAL(breakChanged(bool)), this,
-            SLOT(onBreakChanged(bool)));
+    connect(port, SIGNAL(breakChanged(bool)), this, SLOT(onBreakChanged(bool)));
   }
 
   bytesRecv = 0;
@@ -59,18 +58,6 @@ void MainWindow::onSend() {
   if (!serialPort->isOpen()) {
     return;
   }
-
-  serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
-  serialPort->setDataBits(
-      (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
-  QSerialPort::Parity parity[] = {
-      QSerialPort::NoParity, QSerialPort::EvenParity, QSerialPort::OddParity,
-      QSerialPort::SpaceParity, QSerialPort::MarkParity};
-  serialPort->setParity(parity[parityComboBox->currentIndex()]);
-  serialPort->setStopBits(
-      (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
-  serialPort->setFlowControl(
-      (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
 
   auto text = inputPlainTextEdit->toPlainText();
   auto codec = QTextCodec::codecForName("UTF-8");
@@ -298,6 +285,19 @@ void MainWindow::onOpen() {
     } else {
       statusBar()->showMessage("Failed");
     }
+  }
+  if (serialPort->isOpen()) {
+    serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
+    serialPort->setDataBits(
+        (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
+    QSerialPort::Parity parity[] = {
+        QSerialPort::NoParity, QSerialPort::EvenParity, QSerialPort::OddParity,
+        QSerialPort::SpaceParity, QSerialPort::MarkParity};
+    serialPort->setParity(parity[parityComboBox->currentIndex()]);
+    serialPort->setStopBits(
+        (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
+    serialPort->setFlowControl(
+        (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
   }
 }
 

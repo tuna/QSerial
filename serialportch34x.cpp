@@ -62,11 +62,11 @@ void SerialPortCH34X::setBaudRate(qint32 baudRate) {
     return; // invalid
 
   factor = 0x10000 - factor;
-  quint8 a = (factor & 0xff00) | divisor;
+  quint16 a = (factor & 0xff00) | divisor;
   a |= (1 << 7);
 
   auto rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_WRITE_REG,
-                                    0x2312, a, nullptr, 0, 300);
+                                    0x1312, a, nullptr, 0, 300);
   Q_ASSERT(rc == 0);
 }
 
