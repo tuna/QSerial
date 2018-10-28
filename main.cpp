@@ -4,7 +4,7 @@
 
 int main(int argc, char *argv[]) {
   auto rc = libusb_init(&context);
-  assert(rc == 0);
+  Q_ASSERT(rc == 0);
 
   QApplication app(argc, argv);
 
