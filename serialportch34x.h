@@ -5,6 +5,7 @@
 #include "serialport.h"
 #include <QThread>
 #include <QTimer>
+#include <QAtomicInt>
 
 // reference:
 // Linux kernel ch341.c
@@ -50,6 +51,8 @@ private:
   quint8 dataBits;
   quint8 parity;
   quint8 stopBits;
+
+  QAtomicInt shouldStop;
 };
 
 #endif

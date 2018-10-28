@@ -282,6 +282,14 @@ void MainWindow::onOpen() {
                                    .arg(parityComboBox->currentText())
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
+      serialPortComboBox->setEnabled(false);
+      baudRateComboBox->setEnabled(false);
+      dataBitsComboBox->setEnabled(false);
+      parityComboBox->setEnabled(false);
+      stopBitsComboBox->setEnabled(false);
+      flowControlComboBox->setEnabled(false);
+      sendButton->setText("Send");
+      breakPushButton->setEnabled(true);
     } else {
       statusBar()->showMessage("Failed");
     }
@@ -306,6 +314,14 @@ void MainWindow::onClose() {
   if (serialPort->isOpen()) {
     serialPort->close();
     statusBar()->showMessage("");
+    serialPortComboBox->setEnabled(true);
+    baudRateComboBox->setEnabled(true);
+    dataBitsComboBox->setEnabled(true);
+    parityComboBox->setEnabled(true);
+    stopBitsComboBox->setEnabled(true);
+    flowControlComboBox->setEnabled(true);
+    sendButton->setText("Open and Send");
+    breakPushButton->setEnabled(false);
   }
 }
 

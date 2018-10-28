@@ -3,6 +3,7 @@
 
 #include "libusb.h"
 #include "serialport.h"
+#include <QAtomicInt>
 #include <QThread>
 #include <QTimer>
 
@@ -42,6 +43,7 @@ private:
   libusb_device_handle *handle;
   QThread *thread;
   QTimer *breakTimer;
+  QAtomicInt shouldStop;
 };
 
 #endif

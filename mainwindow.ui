@@ -674,7 +674,7 @@
           <string>Echo</string>
          </property>
         </widget>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>10</x>
@@ -699,7 +699,10 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="pushButton">
+           <widget class="QPushButton" name="breakPushButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>BREAK</string>
             </property>
@@ -864,7 +867,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Send</string>
+           <string>Open and Send</string>
           </property>
          </widget>
         </item>
@@ -990,7 +993,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>pushButton</sender>
+   <sender>breakPushButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
    <slot>onBreak()</slot>

@@ -173,12 +173,14 @@ bool SerialPortCH34X::open() {
     setLcr();
     setHandshake(0);
 
+    shouldStop = 0;
+
     thread = QThread::create([this] {
       char data[64] = {0};
       int len = 0;
-      while (true) {
+      while (!shouldStop) {
         auto rc = libusb_bulk_transfer(handle, 0x82, (unsigned char *)data,
-                                       sizeof(data), &len, 0);
+                                       sizeof(data), &len, 100);
         if (rc == 0) {
           emit this->receivedData(QByteArray(data, len));
         }
@@ -190,7 +192,7 @@ bool SerialPortCH34X::open() {
 }
 bool SerialPortCH34X::isOpen() { return handle != nullptr; }
 void SerialPortCH34X::close() {
-  thread->terminate();
+  shouldStop = 1;
   thread->wait();
   libusb_close(handle);
   handle = nullptr;
