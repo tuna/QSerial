@@ -22,6 +22,7 @@ private slots:
   void onClose();
   void onBreak();
   void onBreakChanged(bool set);
+  void onClear();
 
 private:
   QList<SerialPort *> ports;

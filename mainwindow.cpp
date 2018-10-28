@@ -135,23 +135,26 @@ void MainWindow::onSend() {
     break;
   }
 
-  switch (lineEndingComboBox->currentIndex()) {
-  case 0:
-    // lf
-    data.append('\n');
-    break;
-  case 1:
-    // cr lf
-    data.append('\r');
-    data.append('\n');
-    break;
-  case 2:
-    // cr
-    data.append('\r');
-    break;
-  default:
-    // none
-    break;
+  if (sendParseAsComboBox->currentIndex() != 4) {
+    // no line ending in hex mode
+    switch (lineEndingComboBox->currentIndex()) {
+    case 0:
+      // lf
+      data.append('\n');
+      break;
+    case 1:
+      // cr lf
+      data.append('\r');
+      data.append('\n');
+      break;
+    case 2:
+      // cr
+      data.append('\r');
+      break;
+    default:
+      // none
+      break;
+    }
   }
 
   if (echoCheckBox->isChecked()) {
@@ -338,3 +341,5 @@ void MainWindow::onBreakChanged(bool set) {
     appendText("BREAK OFF", Qt::blue);
   }
 }
+
+void MainWindow::onClear() { textBrowser->setPlainText(""); }
