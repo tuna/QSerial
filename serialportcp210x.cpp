@@ -121,12 +121,12 @@ bool SerialPortCP210X::open() {
 
     thread = QThread::create([this] {
       char data[64] = {0};
-      int len = 0;
       while (!shouldStop) {
+        int len = 0;
         auto rc =
             libusb_bulk_transfer(handle, CP210X_DATA_IN, (unsigned char *)data,
                                  sizeof(data), &len, 100);
-        if (rc == 0) {
+        if (rc == 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
           emit this->receivedData(QByteArray(data, len));
         }
       }

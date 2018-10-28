@@ -9,8 +9,8 @@
 #define CH34X_DATA_OUT (LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT)
 
 #define CH34X_REQ_READ_VERSION 0x5F
+#define CH34X_REQ_READ_REG 0x95
 #define CH34X_REQ_WRITE_REG 0x9A
-#define CH34X_REQ_READ_REG 0x9A
 #define CH34X_REQ_SERIAL_INIT 0xA1
 #define CH34X_REQ_MODEM_CTRL 0xA4
 
@@ -184,12 +184,12 @@ bool SerialPortCH34X::open() {
 
     thread = QThread::create([this] {
       char data[64] = {0};
-      int len = 0;
       while (!shouldStop) {
+        int len = 0;
         auto rc =
             libusb_bulk_transfer(handle, CH34X_DATA_IN, (unsigned char *)data,
                                  sizeof(data), &len, 100);
-        if (rc == 0) {
+        if (rc == 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
           emit this->receivedData(QByteArray(data, len));
         }
       }
