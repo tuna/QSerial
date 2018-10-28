@@ -8,6 +8,25 @@
 #include <QTextCodec>
 #include <QTimer>
 
+#define INDEX_LINE_LF 0
+#define INDEX_LINE_CRLF 1
+#define INDEX_LINE_CR 2
+#define INDEX_LINE_NONE 3
+
+#define INDEX_SEND_UTF8 0
+#define INDEX_SEND_BIG5 1
+#define INDEX_SEND_GB18030 2
+#define INDEX_SEND_SHIFTJIS 3
+#define INDEX_SEND_HEX 4
+#define INDEX_SEND_BASE64 5
+#define INDEX_SEND_PERCENT 6
+
+#define INDEX_RECV_UTF8 0
+#define INDEX_RECV_BIG5 1
+#define INDEX_RECV_GB18030 2
+#define INDEX_RECV_SHIFTJIS 3
+#define INDEX_RECV_HEX 4
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setupUi(this);
 
@@ -66,26 +85,26 @@ void MainWindow::onSend() {
   bool isFirst;
   int currentByte;
   switch (sendParseAsComboBox->currentIndex()) {
-  case 0:
+  case INDEX_SEND_UTF8:
     // text utf-8
     data = textData;
     break;
-  case 1:
+  case INDEX_SEND_BIG5:
     // text big5
     codec = QTextCodec::codecForName("Big5");
     data = codec->fromUnicode(text);
     break;
-  case 2:
+  case INDEX_SEND_GB18030:
     // text gb18030
     codec = QTextCodec::codecForName("GB18030");
     data = codec->fromUnicode(text);
     break;
-  case 3:
+  case INDEX_SEND_SHIFTJIS:
     // text shift-jis
     codec = QTextCodec::codecForName("Shift-JIS");
     data = codec->fromUnicode(text);
     break;
-  case 4:
+  case INDEX_SEND_HEX:
     // hex
     isFirst = true;
     currentByte = 0;
@@ -122,11 +141,11 @@ void MainWindow::onSend() {
       return;
     }
     break;
-  case 5:
+  case INDEX_SEND_BASE64:
     // base64
     data = QByteArray::fromBase64(textData);
     break;
-  case 6:
+  case INDEX_SEND_PERCENT:
     // percent encoding
     data = QByteArray::fromPercentEncoding(textData);
     break;
@@ -135,19 +154,19 @@ void MainWindow::onSend() {
     break;
   }
 
-  if (sendParseAsComboBox->currentIndex() != 4) {
+  if (sendParseAsComboBox->currentIndex() != INDEX_SEND_HEX) {
     // no line ending in hex mode
     switch (lineEndingComboBox->currentIndex()) {
-    case 0:
+    case INDEX_LINE_LF:
       // lf
       data.append('\n');
       break;
-    case 1:
+    case INDEX_LINE_CRLF:
       // cr lf
       data.append('\r');
       data.append('\n');
       break;
-    case 2:
+    case INDEX_LINE_CR:
       // cr
       data.append('\r');
       break;
@@ -208,27 +227,27 @@ void MainWindow::onDataReceived(QByteArray data) {
   QString text;
   QTextCodec *codec;
   switch (recvShowAsComboBox->currentIndex()) {
-  case 0:
+  case INDEX_RECV_UTF8:
     // text utf-8
     codec = QTextCodec::codecForName("UTF-8");
     text = codec->toUnicode(data);
     break;
-  case 1:
+  case INDEX_RECV_BIG5:
     // text big5
     codec = QTextCodec::codecForName("Big5");
     text = codec->toUnicode(data);
     break;
-  case 2:
+  case INDEX_RECV_GB18030:
     // text gb18030
     codec = QTextCodec::codecForName("GB18030");
     text = codec->toUnicode(data);
     break;
-  case 3:
+  case INDEX_RECV_SHIFTJIS:
     // text shift-jis
     codec = QTextCodec::codecForName("Shift-JIS");
     text = codec->toUnicode(data);
     break;
-  case 4:
+  case INDEX_RECV_HEX:
     // hex
     for (auto byte : data) {
       text += toHex((byte & 0xF0) >> 4);

@@ -2,8 +2,11 @@
 #include <QDebug>
 #include <QVector>
 
-#define USB_CTRL_IN (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
-#define USB_CTRL_OUT (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT)
+#define CH34X_CTRL_IN (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
+#define CH34X_CTRL_OUT (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT)
+
+#define CH34X_DATA_IN (LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_IN)
+#define CH34X_DATA_OUT (LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT)
 
 #define CH34X_REQ_READ_VERSION 0x5F
 #define CH34X_REQ_WRITE_REG 0x9A
@@ -28,6 +31,8 @@
 
 #define CH34X_BAUDBASE_FACTOR 1532620800
 #define CH34X_BAUDBASE_DIVMAX 3
+
+#define TIMEOUT 300
 
 SerialPortCH34X::SerialPortCH34X(QObject *parent, libusb_device *device)
     : SerialPort(parent) {
@@ -65,8 +70,8 @@ void SerialPortCH34X::setBaudRate(qint32 baudRate) {
   quint16 a = (factor & 0xff00) | divisor;
   a |= (1 << 7);
 
-  auto rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_WRITE_REG,
-                                    0x1312, a, nullptr, 0, 300);
+  auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
+                                    0x1312, a, nullptr, 0, TIMEOUT);
   Q_ASSERT(rc == 0);
 }
 
@@ -76,15 +81,16 @@ void SerialPortCH34X::setLcr() {
   lcr |= dataBits;
   lcr |= parity;
   lcr |= stopBits;
-  auto rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_WRITE_REG,
-                                    0x2518, lcr, nullptr, 0, 300);
+  auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
+                                    0x2518, lcr, nullptr, 0, TIMEOUT);
   Q_ASSERT(rc == 0);
 }
 
 void SerialPortCH34X::setHandshake(quint8 control) {
   // DTR, RTS mode
-  auto rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_MODEM_CTRL,
-                                    ~control, 0, nullptr, 0, 300);
+  auto rc =
+      libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_MODEM_CTRL,
+                              ~control, 0, nullptr, 0, TIMEOUT);
   Q_ASSERT(rc == 0);
 }
 
@@ -160,13 +166,14 @@ bool SerialPortCH34X::open() {
     unsigned char buffer[2];
     uint size = 2;
 
-    auto rc = libusb_control_transfer(
-        handle, USB_CTRL_IN, CH34X_REQ_READ_VERSION, 0, 0, buffer, size, 300);
+    auto rc =
+        libusb_control_transfer(handle, CH34X_CTRL_IN, CH34X_REQ_READ_VERSION,
+                                0, 0, buffer, size, TIMEOUT);
     Q_ASSERT(rc == 0);
     qWarning() << "CH34x version" << (int)buffer[0];
 
-    rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_SERIAL_INIT, 0,
-                                 0, nullptr, 0, 300);
+    rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_SERIAL_INIT,
+                                 0, 0, nullptr, 0, TIMEOUT);
     Q_ASSERT(rc == 0);
 
     setBaudRate(9600);
@@ -179,8 +186,9 @@ bool SerialPortCH34X::open() {
       char data[64] = {0};
       int len = 0;
       while (!shouldStop) {
-        auto rc = libusb_bulk_transfer(handle, 0x82, (unsigned char *)data,
-                                       sizeof(data), &len, 100);
+        auto rc =
+            libusb_bulk_transfer(handle, CH34X_DATA_IN, (unsigned char *)data,
+                                 sizeof(data), &len, 100);
         if (rc == 0) {
           emit this->receivedData(QByteArray(data, len));
         }
@@ -207,8 +215,8 @@ void SerialPortCH34X::sendData(const QByteArray &data) {
   unsigned char *buffer = new unsigned char[data.length()];
   memcpy(buffer, data.data(), data.length());
 
-  libusb_fill_bulk_transfer(transfer, handle, 0x02, buffer, data.length(),
-                            ch34x_callback, buffer, 0);
+  libusb_fill_bulk_transfer(transfer, handle, CH34X_DATA_OUT, buffer,
+                            data.length(), ch34x_callback, buffer, 0);
   libusb_submit_transfer(transfer);
 }
 
@@ -257,9 +265,9 @@ void SerialPortCH34X::setBreak(bool set) {
   quint16 ch34x_break_reg = ((quint16)CH34X_REG_LCR << 8) | CH34X_REG_BREAK;
   quint8 break_reg[2];
 
-  auto rc = libusb_control_transfer(handle, USB_CTRL_IN, CH34X_REQ_READ_REG,
+  auto rc = libusb_control_transfer(handle, CH34X_CTRL_IN, CH34X_REQ_READ_REG,
                                     ch34x_break_reg, 0, break_reg,
-                                    sizeof(break_reg), 300);
+                                    sizeof(break_reg), TIMEOUT);
   Q_ASSERT(rc == 0);
 
   if (set) {
@@ -270,8 +278,8 @@ void SerialPortCH34X::setBreak(bool set) {
     break_reg[1] |= CH34X_LCR_ENABLE_TX;
   }
 
-  rc = libusb_control_transfer(handle, USB_CTRL_OUT, CH34X_REQ_WRITE_REG,
+  rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
                                ch34x_break_reg, *(quint16 *)break_reg, nullptr,
-                               0, 300);
+                               0, TIMEOUT);
   Q_ASSERT(rc == 0);
 }
