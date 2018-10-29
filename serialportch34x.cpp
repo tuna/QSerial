@@ -72,7 +72,7 @@ void SerialPortCH34X::setBaudRate(qint32 baudRate) {
 
   auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
                                     0x1312, a, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 
 void SerialPortCH34X::setLcr() {
@@ -83,7 +83,7 @@ void SerialPortCH34X::setLcr() {
   lcr |= stopBits;
   auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
                                     0x2518, lcr, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 
 void SerialPortCH34X::setHandshake(quint8 control) {
@@ -91,7 +91,7 @@ void SerialPortCH34X::setHandshake(quint8 control) {
   auto rc =
       libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_MODEM_CTRL,
                               ~control, 0, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 
 void SerialPortCH34X::setParity(QSerialPort::Parity parity) {
@@ -155,13 +155,15 @@ void SerialPortCH34X::setFlowControl(QSerialPort::FlowControl flowControl) {
 }
 bool SerialPortCH34X::open() {
   auto rc = libusb_open(device, &handle);
-  if (rc == 0) {
-    rc = libusb_detach_kernel_driver(handle, 0);
-    Q_ASSERT(rc == 0);
+  if (rc >= 0) {
+    if (libusb_kernel_driver_active(handle, 0) == 1) {
+      rc = libusb_detach_kernel_driver(handle, 0);
+      Q_ASSERT(rc >= 0);
+    }
     rc = libusb_set_configuration(handle, 0);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
     rc = libusb_claim_interface(handle, 0);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
 
     unsigned char buffer[2];
     uint size = 2;
@@ -169,12 +171,12 @@ bool SerialPortCH34X::open() {
     auto rc =
         libusb_control_transfer(handle, CH34X_CTRL_IN, CH34X_REQ_READ_VERSION,
                                 0, 0, buffer, size, TIMEOUT);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
     qWarning() << "CH34x version" << (int)buffer[0];
 
     rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_SERIAL_INIT,
                                  0, 0, nullptr, 0, TIMEOUT);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
 
     setBaudRate(9600);
     setLcr();
@@ -188,15 +190,15 @@ bool SerialPortCH34X::open() {
         int len = 0;
         auto rc =
             libusb_bulk_transfer(handle, CH34X_DATA_IN, (unsigned char *)data,
-                                 sizeof(data), &len, 100);
-        if (rc == 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
+                                 sizeof(data), &len, TIMEOUT);
+        if (rc >= 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
           emit this->receivedData(QByteArray(data, len));
         }
       }
     });
     thread->start();
   }
-  return rc == 0;
+  return rc >= 0;
 }
 bool SerialPortCH34X::isOpen() { return handle != nullptr; }
 void SerialPortCH34X::close() {
@@ -268,7 +270,7 @@ void SerialPortCH34X::setBreak(bool set) {
   auto rc = libusb_control_transfer(handle, CH34X_CTRL_IN, CH34X_REQ_READ_REG,
                                     ch34x_break_reg, 0, break_reg,
                                     sizeof(break_reg), TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 
   if (set) {
     break_reg[0] &= ~CH34X_NBREAK_BITS;
@@ -281,5 +283,5 @@ void SerialPortCH34X::setBreak(bool set) {
   rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
                                ch34x_break_reg, *(quint16 *)break_reg, nullptr,
                                0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }

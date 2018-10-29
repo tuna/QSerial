@@ -297,6 +297,19 @@ void MainWindow::onOpen() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
   if (!serialPort->isOpen()) {
     if (serialPort->open()) {
+      serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
+      serialPort->setDataBits(
+          (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
+      QSerialPort::Parity parity[] = {
+          QSerialPort::NoParity, QSerialPort::EvenParity,
+          QSerialPort::OddParity, QSerialPort::SpaceParity,
+          QSerialPort::MarkParity};
+      serialPort->setParity(parity[parityComboBox->currentIndex()]);
+      serialPort->setStopBits(
+          (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
+      serialPort->setFlowControl(
+          (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
+
       statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
                                    .arg(serialPort->portName())
                                    .arg(baudRateComboBox->currentText().toInt())
@@ -315,19 +328,6 @@ void MainWindow::onOpen() {
     } else {
       statusBar()->showMessage("Failed");
     }
-  }
-  if (serialPort->isOpen()) {
-    serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
-    serialPort->setDataBits(
-        (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
-    QSerialPort::Parity parity[] = {
-        QSerialPort::NoParity, QSerialPort::EvenParity, QSerialPort::OddParity,
-        QSerialPort::SpaceParity, QSerialPort::MarkParity};
-    serialPort->setParity(parity[parityComboBox->currentIndex()]);
-    serialPort->setStopBits(
-        (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
-    serialPort->setFlowControl(
-        (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
   }
 }
 

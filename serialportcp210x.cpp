@@ -15,12 +15,20 @@
 #define CP210X_REQ_SET_LINE_CTL 0x03
 #define CP210X_REQ_GET_LINE_CTL 0x04
 #define CP210X_REQ_SET_BREAK 0x05
-#define CP210X_REQ_EMBED_EVENTS 0x15
+#define CP210X_REQ_GET_COMM_STATUS 0x10
 #define CP210X_REQ_SET_BAUDRATE 0x1E
 
 #define TIMEOUT 300
 
-const unsigned short ESCAPE_CHAR = 0x1e;
+struct __attribute__((packed)) SerialStatusResponse {
+  quint32 ulErrors;
+  quint32 ulHoldReasons;
+  quint32 ulAmountInInQueue;
+  quint32 ulAmountInOutQueue;
+  quint8 bEofReceived;
+  quint8 bWaitForImmediate;
+  quint8 bReserved;
+};
 
 SerialPortCP210X::SerialPortCP210X(QObject *parent, libusb_device *device)
     : SerialPort(parent) {
@@ -43,7 +51,7 @@ void SerialPortCP210X::setBaudRate(qint32 baudRate) {
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_OUT, CP210X_REQ_SET_BAUDRATE, 0, 0,
       (unsigned char *)&baudRate, sizeof(baudRate), TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
   uint16_t lineCtl;
@@ -51,7 +59,7 @@ void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_IN, CP210X_REQ_GET_LINE_CTL, 0, 0,
       (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
   const uint16_t mapping[] = {0, 65535, 2,
                               1, 4,     3}; // No, Even, Odd, Space, Mark
   lineCtl = (lineCtl & 0b1111111100001111) | (mapping[parity] << 4);
@@ -59,7 +67,7 @@ void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
   rc = libusb_control_transfer(handle, CP210X_CTRL_OUT, CP210X_REQ_SET_LINE_CTL,
                                0, 0, (unsigned char *)&lineCtl, sizeof(lineCtl),
                                TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 void SerialPortCP210X::setDataBits(QSerialPort::DataBits dataBits) {
   uint16_t lineCtl;
@@ -67,13 +75,13 @@ void SerialPortCP210X::setDataBits(QSerialPort::DataBits dataBits) {
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_IN, CP210X_REQ_GET_LINE_CTL, 0, 0,
       (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
   lineCtl = (lineCtl & 0b0000000011111111) | (dataBits << 8);
   // SET_LINE_CTL
   rc = libusb_control_transfer(handle, CP210X_CTRL_OUT, CP210X_REQ_SET_LINE_CTL,
                                0, 0, (unsigned char *)&lineCtl, sizeof(lineCtl),
                                TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 void SerialPortCP210X::setStopBits(QSerialPort::StopBits stopBits) {
   uint16_t lineCtl;
@@ -81,14 +89,14 @@ void SerialPortCP210X::setStopBits(QSerialPort::StopBits stopBits) {
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_IN, CP210X_REQ_GET_LINE_CTL, 0, 0,
       (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
   const uint16_t mapping[] = {65535, 0, 2, 1}; // One, Two, OneAndHalf
   lineCtl = (lineCtl & 0b1111111111110000) | mapping[stopBits];
   // SET_LINE_CTL
   rc = libusb_control_transfer(handle, CP210X_CTRL_OUT, CP210X_REQ_SET_LINE_CTL,
                                0, 0, (unsigned char *)&lineCtl, sizeof(lineCtl),
                                TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
 void SerialPortCP210X::setFlowControl(QSerialPort::FlowControl flowControl) {
   // not implemented yet
@@ -96,44 +104,51 @@ void SerialPortCP210X::setFlowControl(QSerialPort::FlowControl flowControl) {
 }
 bool SerialPortCP210X::open() {
   auto rc = libusb_open(device, &handle);
-  if (rc == 0) {
-    rc = libusb_detach_kernel_driver(handle, 0);
-    Q_ASSERT(rc == 0);
+  if (rc >= 0) {
+    if (libusb_kernel_driver_active(handle, 0) == 1) {
+      rc = libusb_detach_kernel_driver(handle, 0);
+      Q_ASSERT(rc >= 0);
+    }
     rc = libusb_set_configuration(handle, 0);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
     rc = libusb_claim_interface(handle, 0);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
 
     // IFC_ENABLE
     auto rc =
         libusb_control_transfer(handle, CP210X_CTRL_OUT, CP210X_REQ_IFC_ENABLE,
                                 1, 0, nullptr, 0, TIMEOUT);
-    Q_ASSERT(rc == 0);
-
-    // FIXME: BREAK recv not working yet
-    // EMBED_EVENTS
-    rc = libusb_control_transfer(handle, CP210X_CTRL_OUT,
-                                 CP210X_REQ_EMBED_EVENTS, ESCAPE_CHAR, 0,
-                                 nullptr, 0, TIMEOUT);
-    Q_ASSERT(rc == 0);
+    Q_ASSERT(rc >= 0);
 
     shouldStop = 0;
 
     thread = QThread::create([this] {
-      char data[64] = {0};
+      quint8 data[64] = {0};
+      SerialStatusResponse resp;
+      bool breakOn = false;
       while (!shouldStop) {
         int len = 0;
-        auto rc =
-            libusb_bulk_transfer(handle, CP210X_DATA_IN, (unsigned char *)data,
-                                 sizeof(data), &len, 100);
-        if (rc == 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
-          emit this->receivedData(QByteArray(data, len));
+        auto rc = libusb_bulk_transfer(handle, CP210X_DATA_IN, data,
+                                       sizeof(data), &len, TIMEOUT);
+        if (rc >= 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
+          emit this->receivedData(QByteArray((char *)data, len));
+        }
+
+        rc = libusb_control_transfer(handle, CP210X_CTRL_IN,
+                                     CP210X_REQ_GET_COMM_STATUS, 0, 0,
+                                     (quint8 *)&resp, sizeof(data), TIMEOUT);
+        if (rc == sizeof(resp)) {
+          if ((resp.ulErrors & 1) != breakOn) {
+            // BREAK Changed
+            breakOn = resp.ulErrors & 1;
+            emit breakChanged(breakOn);
+          }
         }
       }
     });
     thread->start();
   }
-  return rc == 0;
+  return rc >= 0;
 }
 bool SerialPortCP210X::isOpen() { return handle != nullptr; }
 void SerialPortCP210X::close() {
@@ -168,7 +183,7 @@ QList<SerialPort *> SerialPortCP210X::availablePorts(QObject *parent) {
     auto device = list[i];
     libusb_device_descriptor desc = {};
     auto rc = libusb_get_device_descriptor(device, &desc);
-    if (rc == 0) {
+    if (rc >= 0) {
       for (auto dev : supportedCP210XDevices) {
         if (dev.first == desc.idVendor && dev.second == desc.idProduct) {
           // found
@@ -186,7 +201,7 @@ void SerialPortCP210X::triggerBreak(uint msecs) {
   // SET_BREAK
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_OUT, CP210X_REQ_SET_BREAK, 1, 0, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 
   if (breakTimer) {
     breakTimer->stop();
@@ -202,5 +217,5 @@ void SerialPortCP210X::breakTimeout() {
   // SET_BREAK
   auto rc = libusb_control_transfer(
       handle, CP210X_CTRL_OUT, CP210X_REQ_SET_BREAK, 0, 0, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc == 0);
+  Q_ASSERT(rc >= 0);
 }
