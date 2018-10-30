@@ -18,6 +18,7 @@ qint32 SerialPortQt::getBaudRate() { return port->baudRate(); }
 void SerialPortQt::setParity(QSerialPort::Parity parity) {
   port->setParity(parity);
 }
+QSerialPort::Parity SerialPortQt::getParity() { return port->parity(); }
 void SerialPortQt::setDataBits(QSerialPort::DataBits dataBits) {
   port->setDataBits(dataBits);
 }

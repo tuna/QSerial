@@ -3,9 +3,9 @@
 
 #include "libusb.h"
 #include "serialport.h"
+#include <QAtomicInt>
 #include <QThread>
 #include <QTimer>
-#include <QAtomicInt>
 
 // reference:
 // Linux kernel ch341.c
@@ -21,6 +21,7 @@ public:
   qint32 getBaudRate() override { return currentBaudRate; }
   void setDataBits(QSerialPort::DataBits dataBits) override;
   void setParity(QSerialPort::Parity parity) override;
+  QSerialPort::Parity getParity() override { return currentParity; }
   void setStopBits(QSerialPort::StopBits stopBits) override;
   void setFlowControl(QSerialPort::FlowControl flowControl) override;
   bool open() override;

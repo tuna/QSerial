@@ -304,17 +304,18 @@ void MainWindow::onOpen() {
           QSerialPort::NoParity, QSerialPort::EvenParity,
           QSerialPort::OddParity, QSerialPort::SpaceParity,
           QSerialPort::MarkParity};
+      QString parityName[] = {"N", "E", "O", "S", "M"};
       serialPort->setParity(parity[parityComboBox->currentIndex()]);
       serialPort->setStopBits(
           (QSerialPort::StopBits)(stopBitsComboBox->currentIndex() + 1));
       serialPort->setFlowControl(
           (QSerialPort::FlowControl)flowControlComboBox->currentIndex());
 
-      statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
+      statusBar()->showMessage(tr("%1 %2 %3%4%5 %6 Open")
                                    .arg(serialPort->portName())
                                    .arg(serialPort->getBaudRate())
                                    .arg(dataBitsComboBox->currentText())
-                                   .arg(parityComboBox->currentText())
+                                   .arg(parityName[serialPort->getParity()])
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
       serialPortComboBox->setEnabled(false);

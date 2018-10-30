@@ -15,6 +15,7 @@ public:
   qint32 getBaudRate() override { return 115200; }
   void setDataBits(QSerialPort::DataBits) override {}
   void setParity(QSerialPort::Parity) override {}
+  QSerialPort::Parity getParity() override { return QSerialPort::NoParity; }
   void setStopBits(QSerialPort::StopBits) override {}
   void setFlowControl(QSerialPort::FlowControl) override {}
   bool open() override { return isOpening = true; }

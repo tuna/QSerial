@@ -14,6 +14,7 @@ public:
   virtual qint32 getBaudRate() = 0;
   virtual void setDataBits(QSerialPort::DataBits dataBits) = 0;
   virtual void setParity(QSerialPort::Parity parity) = 0;
+  virtual QSerialPort::Parity getParity() = 0;
   virtual void setStopBits(QSerialPort::StopBits stopBits) = 0;
   virtual void setFlowControl(QSerialPort::FlowControl flowControl) = 0;
   virtual bool open() = 0;

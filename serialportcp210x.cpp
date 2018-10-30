@@ -19,6 +19,13 @@
 #define CP210X_REQ_GET_BAUDRATE 0x1D
 #define CP210X_REQ_SET_BAUDRATE 0x1E
 
+#define CP210X_LINE_CTL_PARITY_MASK 0x00f0
+#define CP210X_LINE_CTL_PARITY_NONE 0x0000
+#define CP210X_LINE_CTL_PARITY_ODD 0x0010
+#define CP210X_LINE_CTL_PARITY_EVEN 0x0020
+#define CP210X_LINE_CTL_PARITY_MARK 0x0040
+#define CP210X_LINE_CTL_PARITY_SPACE 0x0080
+
 #define TIMEOUT 300
 
 struct Q_PACKED SerialStatusResponse {
@@ -65,20 +72,38 @@ void SerialPortCP210X::setBaudRate(qint32 baudRate) {
 }
 
 void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
-  uint16_t lineCtl;
-  // GET_LINE_CTL
-  auto rc = libusb_control_transfer(
-      handle, CP210X_CTRL_IN, CP210X_REQ_GET_LINE_CTL, 0, 0,
-      (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
-  Q_ASSERT(rc >= 0);
-  const uint16_t mapping[] = {0, 65535, 2,
-                              1, 4,     3}; // No, Even, Odd, Space, Mark
-  lineCtl = (lineCtl & 0b1111111100001111) | (mapping[parity] << 4);
-  // SET_LINE_CTL
-  rc = libusb_control_transfer(handle, CP210X_CTRL_OUT, CP210X_REQ_SET_LINE_CTL,
-                               0, 0, (unsigned char *)&lineCtl, sizeof(lineCtl),
-                               TIMEOUT);
-  Q_ASSERT(rc >= 0);
+  if (currentParity != parity) {
+    uint16_t lineCtl;
+    // GET_LINE_CTL
+    auto rc = libusb_control_transfer(
+        handle, CP210X_CTRL_IN, CP210X_REQ_GET_LINE_CTL, 0, 0,
+        (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
+    Q_ASSERT(rc >= 0);
+    lineCtl &= ~CP210X_LINE_CTL_PARITY_MASK;
+    switch (parity) {
+    case QSerialPort::NoParity:
+      lineCtl |= CP210X_LINE_CTL_PARITY_NONE;
+      break;
+    case QSerialPort::EvenParity:
+      lineCtl |= CP210X_LINE_CTL_PARITY_EVEN;
+      break;
+    case QSerialPort::OddParity:
+      lineCtl |= CP210X_LINE_CTL_PARITY_ODD;
+      break;
+    case QSerialPort::SpaceParity:
+      lineCtl |= CP210X_LINE_CTL_PARITY_SPACE;
+      break;
+    case QSerialPort::MarkParity:
+      lineCtl |= CP210X_LINE_CTL_PARITY_MARK;
+      break;
+    }
+    // SET_LINE_CTL
+    rc = libusb_control_transfer(
+        handle, CP210X_CTRL_OUT, CP210X_REQ_SET_LINE_CTL, 0, 0,
+        (unsigned char *)&lineCtl, sizeof(lineCtl), TIMEOUT);
+    Q_ASSERT(rc >= 0);
+    currentParity = parity;
+  }
 }
 
 void SerialPortCP210X::setDataBits(QSerialPort::DataBits dataBits) {
