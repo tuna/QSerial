@@ -14,15 +14,17 @@ public:
   explicit MainWindow(QWidget *parent = nullptr);
 
 private slots:
-  void onSend();
   void onReset();
-  void onDataReceived(QByteArray data);
-  void onIdle();
+  void onSend();
+  void onBreak();
+  void onClear();
   void onOpen();
   void onClose();
-  void onBreak();
+  void onMutualTest();
+
+  void onDataReceived(QByteArray data);
+  void onIdle();
   void onBreakChanged(bool set);
-  void onClear();
 
 private:
   QList<SerialPort *> ports;

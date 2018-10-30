@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "libusb.h"
+#include "mutualtest.h"
 #include "serialport.h"
 #include <QDateTime>
 #include <QDebug>
@@ -363,3 +364,8 @@ void MainWindow::onBreakChanged(bool set) {
 }
 
 void MainWindow::onClear() { textBrowser->setPlainText(""); }
+
+void MainWindow::onMutualTest() {
+  MutualTest test;
+  test.exec();
+}
