@@ -12,6 +12,7 @@ public:
   }
   QString portName() override { return "dummy"; }
   void setBaudRate(qint32) override {}
+  qint32 getBaudRate() override { return 115200; }
   void setDataBits(QSerialPort::DataBits) override {}
   void setParity(QSerialPort::Parity) override {}
   void setStopBits(QSerialPort::StopBits) override {}

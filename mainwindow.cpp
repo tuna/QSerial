@@ -312,7 +312,7 @@ void MainWindow::onOpen() {
 
       statusBar()->showMessage(tr("%1 %2 %3 %4 %5 %6 Open")
                                    .arg(serialPort->portName())
-                                   .arg(baudRateComboBox->currentText().toInt())
+                                   .arg(serialPort->getBaudRate())
                                    .arg(dataBitsComboBox->currentText())
                                    .arg(parityComboBox->currentText())
                                    .arg(stopBitsComboBox->currentText())

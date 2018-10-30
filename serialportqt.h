@@ -11,6 +11,7 @@ public:
   static QList<SerialPort *> availablePorts(QObject *parent = nullptr);
   QString portName() override;
   void setBaudRate(qint32 baudRate) override;
+  qint32 getBaudRate() override;
   void setDataBits(QSerialPort::DataBits dataBits) override;
   void setParity(QSerialPort::Parity parity) override;
   void setStopBits(QSerialPort::StopBits stopBits) override;

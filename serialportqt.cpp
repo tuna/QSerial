@@ -14,6 +14,7 @@ SerialPortQt::~SerialPortQt() { delete port; }
 
 QString SerialPortQt::portName() { return port->portName(); }
 void SerialPortQt::setBaudRate(qint32 baudRate) { port->setBaudRate(baudRate); }
+qint32 SerialPortQt::getBaudRate() { return port->baudRate(); }
 void SerialPortQt::setParity(QSerialPort::Parity parity) {
   port->setParity(parity);
 }

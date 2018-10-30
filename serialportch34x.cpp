@@ -5,8 +5,8 @@
 #define CH34X_CTRL_IN (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
 #define CH34X_CTRL_OUT (LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_OUT)
 
-#define CH34X_DATA_IN (LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_IN)
-#define CH34X_DATA_OUT (LIBUSB_RECIPIENT_ENDPOINT | LIBUSB_ENDPOINT_OUT)
+#define CH34X_DATA_IN (0x2 | LIBUSB_ENDPOINT_IN)
+#define CH34X_DATA_OUT (0x2 | LIBUSB_ENDPOINT_OUT)
 
 #define CH34X_REQ_READ_VERSION 0x5F
 #define CH34X_REQ_READ_REG 0x95
@@ -73,6 +73,8 @@ void SerialPortCH34X::setBaudRate(qint32 baudRate) {
   auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
                                     0x1312, a, nullptr, 0, TIMEOUT);
   Q_ASSERT(rc >= 0);
+
+  currentBaudRate = baudRate;
 }
 
 void SerialPortCH34X::setLcr() {
@@ -185,14 +187,13 @@ bool SerialPortCH34X::open() {
     shouldStop = 0;
 
     thread = QThread::create([this] {
-      char data[64] = {0};
+      quint8 data[64] = {0};
       while (!shouldStop) {
         int len = 0;
-        auto rc =
-            libusb_bulk_transfer(handle, CH34X_DATA_IN, (unsigned char *)data,
-                                 sizeof(data), &len, TIMEOUT);
+        auto rc = libusb_bulk_transfer(handle, CH34X_DATA_IN, data,
+                                       sizeof(data), &len, TIMEOUT);
         if (rc >= 0 || (rc == LIBUSB_ERROR_TIMEOUT && len > 0)) {
-          emit this->receivedData(QByteArray(data, len));
+          emit this->receivedData(QByteArray((char *)data, len));
         }
       }
     });
@@ -263,7 +264,6 @@ void SerialPortCH34X::triggerBreak(uint msecs) {
 void SerialPortCH34X::breakTimeout() { setBreak(false); }
 
 void SerialPortCH34X::setBreak(bool set) {
-  qWarning() << set;
   quint16 ch34x_break_reg = ((quint16)CH34X_REG_LCR << 8) | CH34X_REG_BREAK;
   quint8 break_reg[2];
 
