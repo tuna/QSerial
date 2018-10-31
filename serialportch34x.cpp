@@ -55,26 +55,29 @@ QString SerialPortCH34X::portName() {
       .arg(libusb_get_device_address(device));
 }
 void SerialPortCH34X::setBaudRate(qint32 baudRate) {
-  // Taken from Linux kernel ch341_set_baudrate_lcr
-  uint factor = (CH34X_BAUDBASE_FACTOR / baudRate);
-  uint divisor = CH34X_BAUDBASE_DIVMAX;
-  while ((factor > 0xfff0) && divisor) {
-    factor >>= 3;
-    divisor--;
+  if (currentBaudRate != baudRate) {
+    // Taken from Linux kernel ch341_set_baudrate_lcr
+    uint factor = (CH34X_BAUDBASE_FACTOR / baudRate);
+    uint divisor = CH34X_BAUDBASE_DIVMAX;
+    while ((factor > 0xfff0) && divisor) {
+      factor >>= 3;
+      divisor--;
+    }
+
+    if (factor > 0xfff0)
+      return; // invalid
+
+    factor = 0x10000 - factor;
+    quint16 a = (factor & 0xff00) | divisor;
+    a |= (1 << 7);
+
+    auto rc =
+        libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
+                                0x1312, a, nullptr, 0, TIMEOUT);
+    Q_ASSERT(rc >= 0);
+
+    currentBaudRate = baudRate;
   }
-
-  if (factor > 0xfff0)
-    return; // invalid
-
-  factor = 0x10000 - factor;
-  quint16 a = (factor & 0xff00) | divisor;
-  a |= (1 << 7);
-
-  auto rc = libusb_control_transfer(handle, CH34X_CTRL_OUT, CH34X_REQ_WRITE_REG,
-                                    0x1312, a, nullptr, 0, TIMEOUT);
-  Q_ASSERT(rc >= 0);
-
-  currentBaudRate = baudRate;
 }
 
 void SerialPortCH34X::setLcr() {
@@ -97,27 +100,30 @@ void SerialPortCH34X::setHandshake(quint8 control) {
 }
 
 void SerialPortCH34X::setParity(QSerialPort::Parity parity) {
-  switch (parity) {
-  case QSerialPort::NoParity:
-    this->parity = 0;
-    break;
-  case QSerialPort::EvenParity:
-    this->parity = CH34X_LCR_ENABLE_PAR | CH34X_LCR_PAR_EVEN;
-    break;
-  case QSerialPort::OddParity:
-    this->parity = CH34X_LCR_ENABLE_PAR;
-    break;
-  case QSerialPort::MarkParity:
-    this->parity = CH34X_LCR_ENABLE_PAR | CH34X_LCR_MARK_SPACE;
-    break;
-  case QSerialPort::SpaceParity:
-    this->parity =
-        CH34X_LCR_ENABLE_PAR | CH34X_LCR_MARK_SPACE | CH34X_LCR_PAR_EVEN;
-    break;
-  default:
-    break;
+  if (currentParity != parity) {
+    switch (parity) {
+    case QSerialPort::NoParity:
+      this->parity = 0;
+      break;
+    case QSerialPort::EvenParity:
+      this->parity = CH34X_LCR_ENABLE_PAR | CH34X_LCR_PAR_EVEN;
+      break;
+    case QSerialPort::OddParity:
+      this->parity = CH34X_LCR_ENABLE_PAR;
+      break;
+    case QSerialPort::MarkParity:
+      this->parity = CH34X_LCR_ENABLE_PAR | CH34X_LCR_MARK_SPACE;
+      break;
+    case QSerialPort::SpaceParity:
+      this->parity =
+          CH34X_LCR_ENABLE_PAR | CH34X_LCR_MARK_SPACE | CH34X_LCR_PAR_EVEN;
+      break;
+    default:
+      break;
+    }
+    setLcr();
+    currentParity = parity;
   }
-  setLcr();
 }
 void SerialPortCH34X::setDataBits(QSerialPort::DataBits dataBits) {
   switch (dataBits) {

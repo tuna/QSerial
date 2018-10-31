@@ -6,95 +6,80 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>409</height>
+    <width>632</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <widget class="QPushButton" name="pushButton">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>50</y>
-     <width>114</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Begin</string>
-   </property>
-  </widget>
-  <widget class="QTextBrowser" name="textBrowser">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>250</y>
-     <width>381</width>
-     <height>141</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QWidget" name="">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>10</y>
-     <width>381</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout">
-    <item>
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>Device 1</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="device1ComboBox"/>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_2">
-      <property name="text">
-       <string>Device 2</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QComboBox" name="device2ComboBox"/>
-    </item>
-   </layout>
-  </widget>
-  <widget class="QWidget" name="">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>90</y>
-     <width>381</width>
-     <height>151</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QLabel" name="label_3">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QLabel" name="label_4">
-      <property name="text">
-       <string>TextLabel</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Device 1</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="device1ComboBox"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Device 2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="device2ComboBox"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="pushButton">
+     <property name="text">
+      <string>Begin</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QTextBrowser" name="device1TextBrowser"/>
+     </item>
+     <item>
+      <widget class="QTextBrowser" name="device2TextBrowser"/>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QTextBrowser" name="activityTextBrowser"/>
+   </item>
+  </layout>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MutualTest</receiver>
+   <slot>onBegin()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>195</x>
+     <y>66</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>394</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>onBegin()</slot>
+ </slots>
 </ui>

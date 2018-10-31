@@ -56,7 +56,7 @@ QString SerialPortCP210X::portName() {
 }
 
 void SerialPortCP210X::setBaudRate(qint32 baudRate) {
-  if (baudRate != currentBaudRate) {
+  if (currentBaudRate != baudRate) {
     // SET_BAUDRATE
     auto rc = libusb_control_transfer(
         handle, CP210X_CTRL_OUT, CP210X_REQ_SET_BAUDRATE, 0, 0,
@@ -95,6 +95,9 @@ void SerialPortCP210X::setParity(QSerialPort::Parity parity) {
       break;
     case QSerialPort::MarkParity:
       lineCtl |= CP210X_LINE_CTL_PARITY_MARK;
+      break;
+    default:
+      lineCtl |= CP210X_LINE_CTL_PARITY_NONE;
       break;
     }
     // SET_LINE_CTL

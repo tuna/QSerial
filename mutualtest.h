@@ -13,10 +13,20 @@ class MutualTest : public QDialog, private Ui::MutualTest {
 public:
   explicit MutualTest(QWidget *parent = nullptr);
 
+signals:
+  void appendText(QString text);
+
 private slots:
+  void onBegin();
+  void doAppendText(QString text);
+  void receivedData(QByteArray data);
 
 private:
+  void doWork(int direction);
+
   QList<SerialPort *> ports;
+  QThread *thread;
+  QByteArray buffer;
 };
 
 #endif
