@@ -60,7 +60,7 @@ void MutualTest::doWork(int direction) {
   if (from->isOpen() && to->isOpen()) {
     QList<qint32> allBaudRate = {9600, 115200};
     QList<QSerialPort::DataBits> allDataBits = {
-        QSerialPort::Data5, QSerialPOrt::Data6, QSerialPort::Data7,
+        QSerialPort::Data5, QSerialPort::Data6, QSerialPort::Data7,
         QSerialPort::Data8};
     QList<QSerialPort::Parity> allParity = {
         QSerialPort::NoParity, QSerialPort::EvenParity, QSerialPort::OddParity,
