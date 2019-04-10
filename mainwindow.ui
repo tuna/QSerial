@@ -790,7 +790,14 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <widget class="QPlainTextEdit" name="inputPlainTextEdit"/>
+         <widget class="QPlainTextEdit" name="inputPlainTextEdit">
+          <property name="plainText">
+           <string/>
+          </property>
+          <property name="placeholderText">
+           <string>Shift+Enter to send</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="sendButton">

@@ -46,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(onIdle()));
   timer->start(100);
+
+  inputPlainTextEdit->installEventFilter(this);
 }
 
 inline int fromHex(char ch) {
@@ -199,6 +201,8 @@ void MainWindow::onSend() {
     speed += pair.first;
   }
   sentSpeedLabel->setText(toHumanRate(speed));
+
+  inputPlainTextEdit->setFocus();
 }
 
 inline char toHex(int value) {
@@ -368,4 +372,16 @@ void MainWindow::onClear() { textBrowser->setPlainText(""); }
 void MainWindow::onMutualTest() {
   MutualTest test;
   test.exec();
+}
+
+bool MainWindow::eventFilter(QObject *object, QEvent *event) {
+    if (object == inputPlainTextEdit && event->type() == QEvent::KeyPress) {
+        QKeyEvent *key = (QKeyEvent *)event;
+        if (key->key() == Qt::Key_Return && key->modifiers() == Qt::ShiftModifier) {
+            onSend();
+            inputPlainTextEdit->selectAll();
+            return true;
+        }
+    }
+    return QMainWindow::eventFilter(object, event);
 }

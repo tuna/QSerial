@@ -29,6 +29,7 @@ private slots:
 private:
   QList<SerialPort *> ports;
   void appendText(QString text, QColor color);
+  bool eventFilter(QObject *object, QEvent *event);
 
   quint64 bytesRecv;
   quint64 bytesSent;
