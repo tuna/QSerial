@@ -293,6 +293,7 @@ void MainWindow::appendText(QString text, QColor color) {
     arr += ',';
     s++;
   }
+  webEngineView->page()->runJavaScript(QString("term.fit()"));
   QString js = QString("term.write(String.fromCharCode(") + arr + QString("));");
   webEngineView->page()->runJavaScript(js);
 }
@@ -413,4 +414,5 @@ void MainWindow::onToggleTerminal() {
     webEngineView->hide();
     textBrowser->show();
   }
+  webEngineView->page()->runJavaScript(QString("term.fit()"));
 }
