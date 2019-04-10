@@ -48,6 +48,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   timer->start(100);
 
   inputPlainTextEdit->installEventFilter(this);
+  webEngineView->load(QUrl("qrc:/resources/index.html"));
+
+  terminalShowing = false;
+  webEngineView->hide();
 }
 
 inline int fromHex(char ch) {
@@ -279,7 +283,18 @@ void MainWindow::appendText(QString text, QColor color) {
   textBrowser->setTextColor(color);
   textBrowser->insertPlainText(text);
   textBrowser->verticalScrollBar()->setValue(
-      textBrowser->verticalScrollBar()->maximum());
+  textBrowser->verticalScrollBar()->maximum());
+
+
+  QString arr;
+  const ushort *s = text.utf16();
+  while (*s != 0) {
+    arr += QString("%1").arg(*s);
+    arr += ',';
+    s++;
+  }
+  QString js = QString("term.write(String.fromCharCode(") + arr + QString("));");
+  webEngineView->page()->runJavaScript(js);
 }
 
 void MainWindow::onReset() {
@@ -367,7 +382,10 @@ void MainWindow::onBreakChanged(bool set) {
   }
 }
 
-void MainWindow::onClear() { textBrowser->setPlainText(""); }
+void MainWindow::onClear() {
+  textBrowser->setPlainText("");
+  webEngineView->page()->runJavaScript(QString("term.clear()"));
+}
 
 void MainWindow::onMutualTest() {
   MutualTest test;
@@ -384,4 +402,15 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
         }
     }
     return QMainWindow::eventFilter(object, event);
+}
+
+void MainWindow::onToggleTerminal() {
+  terminalShowing = !terminalShowing;
+  if (terminalShowing) {
+    webEngineView->show();
+    textBrowser->hide();
+  } else {
+    webEngineView->hide();
+    textBrowser->show();
+  }
 }

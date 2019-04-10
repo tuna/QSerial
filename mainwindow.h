@@ -21,6 +21,7 @@ private slots:
   void onOpen();
   void onClose();
   void onMutualTest();
+  void onToggleTerminal();
 
   void onDataReceived(QByteArray data);
   void onIdle();
@@ -36,6 +37,7 @@ private:
   QList<QPair<quint64, qint64>> recvRecord;
   QList<QPair<quint64, qint64>> sentRecord;
   QTimer *timer;
+  bool terminalShowing;
 };
 
 #endif
