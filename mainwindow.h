@@ -1,7 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include "serialport.h"
+#include "drivers/serialport.h"
 #include "ui_mainwindow.h"
 #include <QMainWindow>
 #include <QSerialPort>

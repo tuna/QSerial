@@ -1,4 +1,4 @@
-#include "libusb.h"
+#include "drivers/libusb.h"
 #include "mainwindow.h"
 #include <QApplication>
 

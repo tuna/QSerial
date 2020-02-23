@@ -1,7 +1,7 @@
 #ifndef MUTUALTEST_H
 #define MUTUALTEST_H
 
-#include "serialport.h"
+#include "drivers/serialport.h"
 #include "ui_mutualtest.h"
 #include <QDialog>
 #include <QSerialPort>

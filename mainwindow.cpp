@@ -1,7 +1,6 @@
 #include "mainwindow.h"
-#include "libusb.h"
+#include "drivers/libusb.h"
 #include "mutualtest.h"
-#include "serialport.h"
 #include <QDateTime>
 #include <QDebug>
 #include <QScrollBar>
