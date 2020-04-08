@@ -126,6 +126,7 @@ void SerialPortCH34X::setParity(QSerialPort::Parity parity) {
   }
 }
 void SerialPortCH34X::setDataBits(QSerialPort::DataBits dataBits) {
+  // TODO: currentDataBits
   switch (dataBits) {
   case QSerialPort::Data5:
     this->dataBits = CH34X_LCR_CS5;

@@ -371,6 +371,9 @@ void SerialPortPL2303::setBaudRate(qint32 baudRate) {
 
     auto it = std::lower_bound(baud_sup, baud_sup + len, baudRate);
     if (it != baud_sup + len) {
+      if (baudRate != *it) {
+        // TODO: arbitrary baudrate
+      }
       baudRate = *it;
       qDebug() << "set Baudrate to" << baudRate;
       lineOptions[0] = baudRate & 0xff;
@@ -379,6 +382,8 @@ void SerialPortPL2303::setBaudRate(qint32 baudRate) {
       lineOptions[3] = (baudRate >> 24) & 0xff;
       if (setLineOptions())
         currentBaudRate = baudRate;
+    } else {
+      qWarning() << "Baudrate exceeds" << baud_sup[len - 1];
     }
   }
 }
