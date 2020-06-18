@@ -13,7 +13,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
 # This will find the Qt5 files. You will need a QT5_DIR env variable
-find_package(Qt5 COMPONENTS core gui widgets serialport webenginewidgets REQUIRED)
+find_package(Qt5 COMPONENTS Core Gui Widgets SerialPort WebEngineWidgets REQUIRED)
 
 set(SOURCES main.cpp mainwindow.cpp mutualtest.cpp) 
 file(GLOB_RECURSE SOURCES drivers/*.cpp)
