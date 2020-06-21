@@ -306,8 +306,7 @@ void SerialPortPL2303::setParity(QSerialPort::Parity parity) {
       break;
     }
     if (setLineOptions())
-      ;
-    currentParity = parity;
+      currentParity = parity;
   }
 }
 
@@ -371,7 +370,7 @@ void SerialPortPL2303::setBaudRate(qint32 baudRate) {
 
     auto it = std::lower_bound(baud_sup, baud_sup + len, baudRate);
     if (it != baud_sup + len) {
-      if (baudRate != *it) {
+      if ((quint32)baudRate != *it) {
         // TODO: arbitrary baudrate
       }
       baudRate = *it;
