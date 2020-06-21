@@ -216,7 +216,7 @@ void SerialPortCH34X::close() {
   handle = nullptr;
 }
 void ch34x_callback(libusb_transfer *transfer) {
-  delete (unsigned char *)transfer->user_data;
+  delete[] (unsigned char *)transfer->user_data;
   libusb_free_transfer(transfer);
 }
 

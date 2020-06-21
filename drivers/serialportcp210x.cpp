@@ -204,7 +204,7 @@ void SerialPortCP210X::close() {
 }
 
 void cp210x_callback(libusb_transfer *transfer) {
-  delete (unsigned char *)transfer->user_data;
+  delete[] (unsigned char *)transfer->user_data;
   libusb_free_transfer(transfer);
 }
 

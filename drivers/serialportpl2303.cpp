@@ -389,7 +389,7 @@ void SerialPortPL2303::setBaudRate(qint32 baudRate) {
 }
 
 static void pl2303_callback(libusb_transfer *transfer) {
-  delete (unsigned char *)transfer->user_data;
+  delete[] (unsigned char *)transfer->user_data;
   libusb_free_transfer(transfer);
 }
 
