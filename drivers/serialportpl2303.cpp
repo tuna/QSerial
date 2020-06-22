@@ -3,6 +3,7 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QMap>
+#include <iostream>
 
 enum pl2303_quirk {
   PL2303_QUIRK_UART_STATE_IDX0 = (1 << 0),
@@ -104,6 +105,10 @@ QList<SerialPort *> SerialPortPL2303::availablePorts(QObject *parent) {
           type = TYPE_01; /* type 1 */
         else if (desc.bDeviceClass == 0xFF)
           type = TYPE_01; /* type 1 */
+        else {
+          qDebug() << "unknown type of PL2303";
+          break;
+        }
         inst->setType(type);
         inst->setQuirks(pidAndQuirkOfProlific[desc.idProduct] |
                         (type == TYPE_01 ? PL2303_QUIRK_LEGACY : 0));
@@ -120,83 +125,99 @@ bool SerialPortPL2303::open() {
   auto rc = libusb_open(device, &handle);
   if (rc < 0)
     return false;
-  if (libusb_kernel_driver_active(handle, 0) == 1) {
-    rc = libusb_detach_kernel_driver(handle, 0);
-    Q_ASSERT(rc >= 0);
-  }
-  rc = libusb_set_configuration(handle, 0);
-  Q_ASSERT(rc >= 0);
-  rc = libusb_claim_interface(handle, 0);
-  Q_ASSERT(rc >= 0);
+  try {
+    if (libusb_kernel_driver_active(handle, 0) == 1) {
+      rc = libusb_detach_kernel_driver(handle, 0);
+      if (rc < 0) {
+        throw "Failed to detach the kernel driver";
+      }
+      qInfo() << "kernel driver detached";
+    }
+    rc = libusb_set_configuration(handle, 1);
+    if (rc < 0) {
+      throw "Failed to set configuration";
+    }
+    rc = libusb_claim_interface(handle, 0);
+    if (rc < 0) {
+      throw "Failed to claim interface";
+    }
 
-  libusb_config_descriptor *cfgDesc;
-  rc = libusb_get_active_config_descriptor(device, &cfgDesc);
-  Q_ASSERT(rc >= 0);
+    libusb_config_descriptor *cfgDesc;
+    rc = libusb_get_config_descriptor(device, 0, &cfgDesc);
+    if (rc < 0) {
+      throw "Failed to get config descriptor";
+    }
 
-  dataEPOut = 0;
-  dataEPIn = 0;
+    dataEPOut = 0;
+    dataEPIn = 0;
 
-  Q_ASSERT(cfgDesc->bNumInterfaces > 0 &&
-           cfgDesc->interface[0].num_altsetting > 0);
-  auto &ifaceDesc = cfgDesc->interface[0].altsetting[0];
-  for (int i = 0; i < ifaceDesc.bNumEndpoints; i++) {
-    if (LIBUSB_TRANSFER_TYPE_BULK ==
-        (ifaceDesc.endpoint[i].bmAttributes & 0x3)) {
-      if ((ifaceDesc.endpoint[i].bEndpointAddress & 0x80))
-        dataEPIn = ifaceDesc.endpoint[i].bEndpointAddress;
+    Q_ASSERT(cfgDesc->bNumInterfaces > 0 &&
+             cfgDesc->interface[0].num_altsetting > 0);
+    auto &ifaceDesc = cfgDesc->interface[0].altsetting[0];
+    for (int i = 0; i < ifaceDesc.bNumEndpoints; i++) {
+      if (LIBUSB_TRANSFER_TYPE_BULK ==
+          (ifaceDesc.endpoint[i].bmAttributes & 0x3)) {
+        if ((ifaceDesc.endpoint[i].bEndpointAddress & 0x80))
+          dataEPIn = ifaceDesc.endpoint[i].bEndpointAddress;
+        else
+          dataEPOut = ifaceDesc.endpoint[i].bEndpointAddress;
+      }
+    }
+    qDebug() << "EP_IN" << dataEPIn << "EP_OUT" << dataEPOut;
+    Q_ASSERT(dataEPOut && dataEPIn);
+
+    if (type == TYPE_HX) {
+      unsigned char buf[1];
+      rc = libusb_control_transfer(handle, VENDOR_READ_REQUEST_TYPE,
+                                   VENDOR_READ_REQUEST,
+                                   PL2303_READ_TYPE_HX_STATUS, 0, buf, 1, 100);
+      if (rc != 1)
+        type = TYPE_HXN;
+    }
+    if (type != TYPE_HXN) {
+      unsigned char buf[1];
+      vendorRead(0x8484, buf);
+      vendorWrite(0x0404, 0);
+      vendorRead(0x8484, buf);
+      vendorRead(0x8383, buf);
+      vendorRead(0x8484, buf);
+      vendorWrite(0x0404, 1);
+      vendorRead(0x8484, buf);
+      vendorRead(0x8383, buf);
+      vendorWrite(0, 1);
+      vendorWrite(1, 0);
+      if ((quirks & PL2303_QUIRK_LEGACY))
+        vendorWrite(2, 0x24);
       else
-        dataEPOut = ifaceDesc.endpoint[i].bEndpointAddress;
+        vendorWrite(2, 0x44);
     }
-  }
-  qDebug() << "EP_IN" << dataEPIn << "EP_OUT" << dataEPOut;
-  Q_ASSERT(dataEPOut && dataEPIn);
-
-  if (type == TYPE_HX) {
-    unsigned char buf[1];
-    rc = libusb_control_transfer(handle, VENDOR_READ_REQUEST_TYPE,
-                                 VENDOR_READ_REQUEST,
-                                 PL2303_READ_TYPE_HX_STATUS, 0, buf, 1, 100);
-    if (rc != 1)
-      type = TYPE_HXN;
-  }
-  if (type != TYPE_HXN) {
-    unsigned char buf[1];
-    vendorRead(0x8484, buf);
-    vendorWrite(0x0404, 0);
-    vendorRead(0x8484, buf);
-    vendorRead(0x8383, buf);
-    vendorRead(0x8484, buf);
-    vendorWrite(0x0404, 1);
-    vendorRead(0x8484, buf);
-    vendorRead(0x8383, buf);
-    vendorWrite(0, 1);
-    vendorWrite(1, 0);
-    if ((quirks & PL2303_QUIRK_LEGACY))
-      vendorWrite(2, 0x24);
-    else
-      vendorWrite(2, 0x44);
-  }
-  if (quirks & PL2303_QUIRK_LEGACY) {
-    libusb_clear_halt(handle, dataEPIn);
-    libusb_clear_halt(handle, dataEPOut);
-  } else {
-    /* reset upstream data pipes */
-    if (type == TYPE_HXN) {
-      vendorWrite(PL2303_HXN_RESET_REG, PL2303_HXN_RESET_UPSTREAM_PIPE |
-                                            PL2303_HXN_RESET_DOWNSTREAM_PIPE);
+    if (quirks & PL2303_QUIRK_LEGACY) {
+      libusb_clear_halt(handle, dataEPIn);
+      libusb_clear_halt(handle, dataEPOut);
     } else {
-      vendorWrite(8, 0);
-      vendorWrite(9, 0);
+      /* reset upstream data pipes */
+      if (type == TYPE_HXN) {
+        vendorWrite(PL2303_HXN_RESET_REG, PL2303_HXN_RESET_UPSTREAM_PIPE |
+                                              PL2303_HXN_RESET_DOWNSTREAM_PIPE);
+      } else {
+        vendorWrite(8, 0);
+        vendorWrite(9, 0);
+      }
     }
-  }
-  qDebug() << "PL2303 type " << type << "quirks" << quirks;
+    qInfo() << "PL2303 type " << type << "quirks" << quirks;
 
-  getLineOptions();
-  lineOptions[6] = 8; // 8 data bits
-  lineOptions[5] = 0; // no parity
-  lineOptions[4] = 0; // 1 stop bit
-  setBaudRate(9600);  // also set other line options
-  setControlLines(0);
+    getLineOptions();
+    lineOptions[6] = 8; // 8 data bits
+    lineOptions[5] = 0; // no parity
+    lineOptions[4] = 0; // 1 stop bit
+    setBaudRate(9600);  // also set other line options
+    setControlLines(0);
+  } catch (const char *err) {
+    qWarning() << err;
+    libusb_close(handle);
+    handle = nullptr;
+    return false;
+  }
 
   shouldStop = 0;
 

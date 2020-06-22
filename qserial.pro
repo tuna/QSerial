@@ -1,4 +1,5 @@
 QT += core gui widgets serialport webenginewidgets
+CONFIG += console
 TEMPLATE = app
 TARGET = QSerial
 INCLUDEPATH += .
