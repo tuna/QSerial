@@ -17,6 +17,9 @@ jobs:
       uses: jurplel/install-qt-action@v2
       with:
           modules: qtwebengine
+    - name: Install libusb
+      run: |
+          libusb-dev
     - name: qmake
       run: qmake qserial.pro
     - name: make
