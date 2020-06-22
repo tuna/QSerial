@@ -16,6 +16,6 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
     - name: qmake
-      run: qmake serial.pro
+      run: qmake qserial.pro
     - name: make
       run: make
