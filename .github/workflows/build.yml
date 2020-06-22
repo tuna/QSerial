@@ -16,7 +16,7 @@ jobs:
     - name: Install libusb
       run: |
           sudo apt update
-          sudo apt install libusb-dev
+          sudo apt install libusb-1.0-0-dev
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
