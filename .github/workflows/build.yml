@@ -1,0 +1,27 @@
+name: Qt CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Install libusb
+      run: |
+          sudo apt update
+          sudo apt install libusb-1.0-0-dev
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v2
+      with:
+          modules: qtwebengine
+    - name: qmake
+      run: qmake qserial.pro
+    - name: make
+      run: make
