@@ -1,10 +1,13 @@
 QSerial
 ====================
 
-The missing cross platform serial port utility with batteries included. It can talk to USB directly. Supported devices include:
+The missing cross platform serial port utility with batteries included.
+
+Following devices are supported, even without kernel-mode driver:
 
 - Silicon Labs CP210x
 - WCH CH34x
+- Prolific PL2303x
 
 Implemented features:
 
