@@ -16,3 +16,10 @@ Implemented features:
 - Send BREAK condition.
 - Show received data as UTF-8, Big5, GB18030, Shift-JIS or hex.
 - Speed meter.
+
+Installation:
+
+AUR
+```bash
+yay -S qserial
+```
