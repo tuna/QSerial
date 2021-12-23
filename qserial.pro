@@ -1,4 +1,4 @@
-QT += core gui widgets serialport webenginewidgets
+QT += core gui widgets serialport webenginewidgets core5compat
 CONFIG += console
 TEMPLATE = app
 TARGET = QSerial
