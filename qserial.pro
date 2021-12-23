@@ -9,7 +9,9 @@ HEADERS += mainwindow.h mutualtest.h drivers/serialport.h drivers/serialportqt.h
 RESOURCES += resources.qrc
 FORMS += mainwindow.ui mutualtest.ui
 INCLUDEPATH += /usr/local/include
-LIBS += -L/usr/local/lib -lusb-1.0
+LIBS += -L/usr/local/lib 
 QMAKE_CXX_FLAGS += -fsanitize=address
 QMAKE_LFLAGS += -fsanitize=address
 TRANSLATIONS +=
+CONFIG += link_pkgconfig
+PKGCONFIG += libusb-1.0
