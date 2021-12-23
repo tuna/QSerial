@@ -1,4 +1,7 @@
-QT += core gui widgets serialport webenginewidgets core5compat
+QT += core gui widgets serialport webenginewidgets
+equals(QT_VERSION, 6){
+  QT += core5compat
+}
 CONFIG += console
 TEMPLATE = app
 TARGET = QSerial
