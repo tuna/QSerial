@@ -292,7 +292,7 @@ void MainWindow::appendText(QString text, QColor color) {
     arr += ',';
     s++;
   }
-  webEngineView->page()->runJavaScript(QString("term.fit()"));
+  fitTerminal();
   QString js = QString("term.write(String.fromCharCode(") + arr + QString("));");
   webEngineView->page()->runJavaScript(js);
 }
@@ -413,5 +413,15 @@ void MainWindow::onToggleTerminal() {
     webEngineView->hide();
     textBrowser->show();
   }
-  webEngineView->page()->runJavaScript(QString("term.fit()"));
+}
+
+void MainWindow::fitTerminal() {
+   webEngineView->page()->runJavaScript(QString("term.fit()"));
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+   QMainWindow::resizeEvent(event);
+   // resize after the size change has propagated into the WebView
+   QTimer::singleShot(100, this, &MainWindow::fitTerminal);
 }

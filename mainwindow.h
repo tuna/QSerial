@@ -13,6 +13,9 @@ class MainWindow : public QMainWindow, private Ui::MainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
 
+protected:
+   void resizeEvent(QResizeEvent *event);
+
 private slots:
   void onReset();
   void onSend();
@@ -31,6 +34,7 @@ private:
   QList<SerialPort *> ports;
   void appendText(QString text, QColor color);
   bool eventFilter(QObject *object, QEvent *event);
+  void fitTerminal();
 
   quint64 bytesRecv;
   quint64 bytesSent;
