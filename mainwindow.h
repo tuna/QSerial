@@ -7,6 +7,7 @@
 #include <QSerialPort>
 #include <QWidget>
 #include <QJsonArray>
+#include <QSettings>
 
 class MainWindow : public QMainWindow, private Ui::MainWindow {
   Q_OBJECT
@@ -40,6 +41,8 @@ private:
   void fitTerminal();
   void refreshStatistics();
   void refreshOpenStatus();
+  void saveSettings();
+  void loadSettings();
 
   quint64 bytesRecv;
   quint64 bytesSent;
@@ -49,6 +52,7 @@ private:
   QLabel *statisticsLabel;
   QIcon playIcon, stopIcon;
   bool isOpened;
+  QSettings settings;
 };
 
 class JsInterface : public QObject

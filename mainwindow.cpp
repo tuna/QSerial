@@ -51,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(port, SIGNAL(breakChanged(bool)), this, SLOT(onBreakChanged(bool)));
   }
 
+  loadSettings();
+
   bytesRecv = 0;
   bytesSent = 0;
 
@@ -411,6 +413,7 @@ void MainWindow::onOpen() {
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
       refreshOpenStatus();
+      saveSettings();
 
       // set focus to corresponding widget upon connection
       onTabPageChanged(tabWidget->currentIndex());
@@ -478,6 +481,7 @@ void MainWindow::fitTerminal() {
 }
 
 void MainWindow::onTabPageChanged(int index) {
+  settings.setValue("tabPane", index);
   if (index == tabWidget->indexOf(tab_term)) {
     fitTerminal();
     webEngineView->setFocus();
@@ -492,4 +496,34 @@ void MainWindow::resizeEvent(QResizeEvent* event)
    QMainWindow::resizeEvent(event);
    // resize after the size change has propagated into the WebView
    QTimer::singleShot(100, this, &MainWindow::fitTerminal);
+}
+
+void MainWindow::saveSettings() {
+  settings.setValue("baud", baudRateComboBox->currentText().toInt());
+  settings.setValue("dataBits", (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
+  settings.setValue("parity", parityComboBox->currentIndex());
+  settings.setValue("stopBits", stopBitsComboBox->currentIndex());
+  settings.setValue("flowControl", flowControlComboBox->currentIndex());
+  settings.setValue("deviceName", serialPortComboBox->currentText());
+}
+
+void MainWindow::loadSettings() {
+  int baud = settings.value("baud", 115200).toInt();
+  baudRateComboBox->setCurrentText(QString::number(baud));
+
+  int dataBits = settings.value("dataBits", 8).toInt();
+  dataBitsComboBox->setCurrentText(QString::number(dataBits));
+
+  parityComboBox->setCurrentIndex(settings.value("parity", 0).toInt());
+  stopBitsComboBox->setCurrentIndex(settings.value("stopBits", 0).toInt());
+  flowControlComboBox->setCurrentIndex(settings.value("flowControl", 0).toInt());
+
+  QString name = settings.value("deviceName").toString();
+  for (int i = 0; i < serialPortComboBox->count(); i++) {
+      if (serialPortComboBox->itemText(i) == name) {
+          serialPortComboBox->setCurrentIndex(i);
+      }
+  }
+
+  tabWidget->setCurrentIndex(settings.value("tabPane", 0).toInt());
 }
