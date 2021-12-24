@@ -7,6 +7,8 @@
 #include <QSerialPortInfo>
 #include <QTextCodec>
 #include <QTimer>
+#include <QWebChannel>
+#include <QMessageBox>
 
 #define INDEX_LINE_LF 0
 #define INDEX_LINE_CRLF 1
@@ -27,6 +29,16 @@
 #define INDEX_RECV_SHIFTJIS 3
 #define INDEX_RECV_HEX 4
 
+void JsInterface::sendBytes(const QJsonArray& dat) const {
+  QJsonArray::const_iterator itrArray = dat.begin();
+  QByteArray aryBytes;
+  while( itrArray != dat.end() ) {
+    aryBytes.append(static_cast<char>(itrArray->toInt()));
+    itrArray++;
+  }
+  parentWindow->sendBytes(aryBytes);
+}
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setupUi(this);
 
@@ -39,6 +51,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(port, SIGNAL(breakChanged(bool)), this, SLOT(onBreakChanged(bool)));
   }
 
+  loadSettings();
+
   bytesRecv = 0;
   bytesSent = 0;
 
@@ -49,8 +63,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   inputPlainTextEdit->installEventFilter(this);
   webEngineView->load(QUrl("qrc:/resources/index.html"));
 
-  terminalShowing = false;
-  webEngineView->hide();
+  QWebChannel* channel = new QWebChannel(webEngineView);
+  JsInterface* intf = new JsInterface(this);
+  webEngineView->page()->setWebChannel(channel);
+  channel->registerObject(QString("interface"), intf);
+
+  statisticsLabel = new QLabel(this);
+  statusBar()->addPermanentWidget(statisticsLabel);
+  onReset(); // reset and show statistics
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(refreshStatistics()));
+  timer->start(250);
+
+  playIcon = QIcon(":/resources/play.svg");
+  stopIcon = QIcon(":/resources/stop.svg");
+  isOpened = false;
+  refreshOpenStatus();
 }
 
 inline int fromHex(char ch) {
@@ -77,12 +106,51 @@ inline QString toHumanRate(quint64 rate) {
   }
 }
 
-void MainWindow::onSend() {
+void MainWindow::refreshStatistics() {
+  quint64 txspeed = 0;
+  for (auto pair : sentRecord) {
+    txspeed += pair.first;
+  }
+
+  quint64 rxspeed = 0;
+  for (auto pair : recvRecord) {
+    rxspeed += pair.first;
+  }
+
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  while (!sentRecord.isEmpty() &&
+         sentRecord.first().second < currentTime - 1000) {
+    sentRecord.pop_front();
+  }
+  while (!recvRecord.isEmpty() &&
+         recvRecord.first().second < currentTime - 1000) {
+    recvRecord.pop_front();
+  }
+
+  auto txt = QString("TX: %1 (%2)  RX: %3 (%4)")
+          .arg(bytesSent)
+          .arg(toHumanRate(txspeed))
+          .arg(bytesRecv)
+          .arg(toHumanRate(rxspeed));
+  statisticsLabel->setText(txt);
+}
+
+void MainWindow::sendBytes(const QByteArray& data) {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  onOpen();
+
   if (!serialPort->isOpen()) {
     return;
   }
+
+  serialPort->sendData(data);
+
+  bytesSent += data.length();
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
+}
+
+void MainWindow::onSend() {
+  onOpen();
 
   auto text = inputPlainTextEdit->toPlainText();
   auto codec = QTextCodec::codecForName("UTF-8");
@@ -190,20 +258,8 @@ void MainWindow::onSend() {
     }
     appendText(text, Qt::green);
   }
-  serialPort->sendData(data);
 
-  bytesSent += data.length();
-  bytesSentLabel->setText(QString("%1").arg(bytesSent));
-  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-  sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-  while (sentRecord.first().second < currentTime - 1000) {
-    sentRecord.pop_front();
-  }
-  quint64 speed = 0;
-  for (auto pair : sentRecord) {
-    speed += pair.first;
-  }
-  sentSpeedLabel->setText(toHumanRate(speed));
+  sendBytes(data);
 
   inputPlainTextEdit->setFocus();
 }
@@ -220,17 +276,8 @@ inline char toHex(int value) {
 
 void MainWindow::onDataReceived(QByteArray data) {
   bytesRecv += data.length();
-  bytesRecvLabel->setText(QString("%1").arg(bytesRecv));
   qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
   recvRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-  while (recvRecord.first().second < currentTime - 1000) {
-    recvRecord.pop_front();
-  }
-  quint64 speed = 0;
-  for (auto pair : recvRecord) {
-    speed += pair.first;
-  }
-  recvSpeedLabel->setText(toHumanRate(speed));
 
   QString text;
   QTextCodec *codec;
@@ -267,24 +314,10 @@ void MainWindow::onDataReceived(QByteArray data) {
     // never happens
     break;
   }
-  if (recvShowTimeCheckBox->isChecked()) {
-    text = QString("[%1] %2")
-               .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-               .arg(text);
-  }
   appendText(text, Qt::red);
 }
 
 void MainWindow::appendText(QString text, QColor color) {
-  auto cursor = textBrowser->textCursor();
-  cursor.movePosition(QTextCursor::End);
-  textBrowser->setTextCursor(cursor);
-  textBrowser->setTextColor(color);
-  textBrowser->insertPlainText(text);
-  textBrowser->verticalScrollBar()->setValue(
-  textBrowser->verticalScrollBar()->maximum());
-
-
   QString arr;
   const ushort *s = text.utf16();
   while (*s != 0) {
@@ -292,20 +325,31 @@ void MainWindow::appendText(QString text, QColor color) {
     arr += ',';
     s++;
   }
-  webEngineView->page()->runJavaScript(QString("term.fit()"));
+  fitTerminal();
   QString js = QString("term.write(String.fromCharCode(") + arr + QString("));");
   webEngineView->page()->runJavaScript(js);
+
+  if (recvShowTimeCheckBox->isChecked()) {
+    if (!textBrowser->toPlainText().endsWith('\n')) {
+      text = QString("\n") + text;
+    }
+    text.replace("\n", QString("\n[%1] ")
+               .arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
+  }
+  auto cursor = textBrowser->textCursor();
+  cursor.movePosition(QTextCursor::End);
+  textBrowser->setTextCursor(cursor);
+  textBrowser->setTextColor(color);
+  textBrowser->insertPlainText(text);
+  textBrowser->verticalScrollBar()->setValue(textBrowser->verticalScrollBar()->maximum());
 }
 
 void MainWindow::onReset() {
   bytesRecv = 0;
-  bytesRecvLabel->setText("0");
   bytesSent = 0;
-  bytesSentLabel->setText("0");
   recvRecord.clear();
-  recvSpeedLabel->setText("0");
   sentRecord.clear();
-  sentSpeedLabel->setText("0");
+  refreshStatistics();
 }
 
 void MainWindow::onIdle() {
@@ -313,10 +357,40 @@ void MainWindow::onIdle() {
   libusb_handle_events_timeout_completed(context, &tv, nullptr);
 }
 
+void MainWindow::refreshOpenStatus() {
+  auto serialPort = ports[serialPortComboBox->currentIndex()];
+
+  if (!isOpened) {
+    statusBar()->showMessage("");
+    serialPortComboBox->setEnabled(true);
+    baudRateComboBox->setEnabled(true);
+    dataBitsComboBox->setEnabled(true);
+    parityComboBox->setEnabled(true);
+    stopBitsComboBox->setEnabled(true);
+    flowControlComboBox->setEnabled(true);
+    sendButton->setText("Open and Send");
+    breakPushButton->setEnabled(false);
+    openCloseButton->setText("Open");
+    openCloseButton->setIcon(playIcon);
+  } else {
+    serialPortComboBox->setEnabled(false);
+    baudRateComboBox->setEnabled(false);
+    dataBitsComboBox->setEnabled(false);
+    parityComboBox->setEnabled(false);
+    stopBitsComboBox->setEnabled(false);
+    flowControlComboBox->setEnabled(false);
+    sendButton->setText("Send");
+    breakPushButton->setEnabled(true);
+    openCloseButton->setText("Close");
+    openCloseButton->setIcon(stopIcon);
+  }
+}
+
 void MainWindow::onOpen() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  if (!serialPort->isOpen()) {
+  if (!isOpened) {
     if (serialPort->open()) {
+      isOpened = true;
       serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
       serialPort->setDataBits(
           (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
@@ -338,14 +412,11 @@ void MainWindow::onOpen() {
                                    .arg(parityName[serialPort->getParity() + 1]) // getParity() may return -1
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
-      serialPortComboBox->setEnabled(false);
-      baudRateComboBox->setEnabled(false);
-      dataBitsComboBox->setEnabled(false);
-      parityComboBox->setEnabled(false);
-      stopBitsComboBox->setEnabled(false);
-      flowControlComboBox->setEnabled(false);
-      sendButton->setText("Send");
-      breakPushButton->setEnabled(true);
+      refreshOpenStatus();
+      saveSettings();
+
+      // set focus to corresponding widget upon connection
+      onTabPageChanged(tabWidget->currentIndex());
     } else {
       statusBar()->showMessage("Failed");
     }
@@ -354,17 +425,18 @@ void MainWindow::onOpen() {
 
 void MainWindow::onClose() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  if (serialPort->isOpen()) {
+  if (isOpened) {
+    isOpened = false;
     serialPort->close();
-    statusBar()->showMessage("");
-    serialPortComboBox->setEnabled(true);
-    baudRateComboBox->setEnabled(true);
-    dataBitsComboBox->setEnabled(true);
-    parityComboBox->setEnabled(true);
-    stopBitsComboBox->setEnabled(true);
-    flowControlComboBox->setEnabled(true);
-    sendButton->setText("Open and Send");
-    breakPushButton->setEnabled(false);
+    refreshOpenStatus();
+  }
+}
+
+void MainWindow::onToggleOpen() {
+  if (isOpened) {
+    onClose();
+  } else {
+    onOpen();
   }
 }
 
@@ -384,7 +456,7 @@ void MainWindow::onBreakChanged(bool set) {
 
 void MainWindow::onClear() {
   textBrowser->setPlainText("");
-  webEngineView->page()->runJavaScript(QString("term.clear()"));
+  webEngineView->page()->runJavaScript(QString("if (term) term.clear();"));
 }
 
 void MainWindow::onMutualTest() {
@@ -404,14 +476,54 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
     return QMainWindow::eventFilter(object, event);
 }
 
-void MainWindow::onToggleTerminal() {
-  terminalShowing = !terminalShowing;
-  if (terminalShowing) {
-    webEngineView->show();
-    textBrowser->hide();
-  } else {
-    webEngineView->hide();
-    textBrowser->show();
+void MainWindow::fitTerminal() {
+   webEngineView->page()->runJavaScript(QString("if (term) term.fit();"));
+}
+
+void MainWindow::onTabPageChanged(int index) {
+  settings.setValue("tabPane", index);
+  if (index == tabWidget->indexOf(tab_term)) {
+    fitTerminal();
+    webEngineView->setFocus();
+    webEngineView->page()->runJavaScript(QString("if (term) term.focus();"));
+  } else if (index == tabWidget->indexOf(tab_text)) {
+    inputPlainTextEdit->setFocus();
   }
-  webEngineView->page()->runJavaScript(QString("term.fit()"));
+}
+
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+   QMainWindow::resizeEvent(event);
+   // resize after the size change has propagated into the WebView
+   QTimer::singleShot(100, this, &MainWindow::fitTerminal);
+}
+
+void MainWindow::saveSettings() {
+  settings.setValue("baud", baudRateComboBox->currentText().toInt());
+  settings.setValue("dataBits", (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
+  settings.setValue("parity", parityComboBox->currentIndex());
+  settings.setValue("stopBits", stopBitsComboBox->currentIndex());
+  settings.setValue("flowControl", flowControlComboBox->currentIndex());
+  settings.setValue("deviceName", serialPortComboBox->currentText());
+}
+
+void MainWindow::loadSettings() {
+  int baud = settings.value("baud", 115200).toInt();
+  baudRateComboBox->setCurrentText(QString::number(baud));
+
+  int dataBits = settings.value("dataBits", 8).toInt();
+  dataBitsComboBox->setCurrentText(QString::number(dataBits));
+
+  parityComboBox->setCurrentIndex(settings.value("parity", 0).toInt());
+  stopBitsComboBox->setCurrentIndex(settings.value("stopBits", 0).toInt());
+  flowControlComboBox->setCurrentIndex(settings.value("flowControl", 0).toInt());
+
+  QString name = settings.value("deviceName").toString();
+  for (int i = 0; i < serialPortComboBox->count(); i++) {
+      if (serialPortComboBox->itemText(i) == name) {
+          serialPortComboBox->setCurrentIndex(i);
+      }
+  }
+
+  tabWidget->setCurrentIndex(settings.value("tabPane", 0).toInt());
 }

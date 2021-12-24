@@ -1,9 +1,10 @@
-<!DOCTYPE RCC><RCC version="1.0">
-    <qresource>
+<RCC>
+    <qresource prefix="/">
         <file>resources/index.html</file>
         <file>resources/node_modules/xterm/dist/xterm.js</file>
         <file>resources/node_modules/xterm/dist/xterm.css</file>
         <file>resources/node_modules/xterm/dist/addons/fit/fit.js</file>
+        <file>resources/play.svg</file>
+        <file>resources/stop.svg</file>
     </qresource>
 </RCC>
-

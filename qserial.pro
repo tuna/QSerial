@@ -1,5 +1,5 @@
 QT += core gui widgets serialport webenginewidgets
-equals(QT_VERSION, 6){
+equals(QT_MAJOR_VERSION, 6){
   QT += core5compat
 }
 CONFIG += console
