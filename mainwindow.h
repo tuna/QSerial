@@ -27,6 +27,7 @@ private slots:
   void onClose();
   void onToggleOpen();
   void onMutualTest();
+  void onTabPageChanged(int index);
 
   void onDataReceived(QByteArray data);
   void onIdle();

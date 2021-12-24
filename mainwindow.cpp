@@ -411,6 +411,9 @@ void MainWindow::onOpen() {
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
       refreshOpenStatus();
+
+      // set focus to corresponding widget upon connection
+      onTabPageChanged(tabWidget->currentIndex());
     } else {
       statusBar()->showMessage("Failed");
     }
@@ -472,6 +475,16 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
 
 void MainWindow::fitTerminal() {
    webEngineView->page()->runJavaScript(QString("if (term) term.fit();"));
+}
+
+void MainWindow::onTabPageChanged(int index) {
+  if (index == tabWidget->indexOf(tab_term)) {
+    fitTerminal();
+    webEngineView->setFocus();
+    webEngineView->page()->runJavaScript(QString("if (term) term.focus();"));
+  } else if (index == tabWidget->indexOf(tab_text)) {
+    inputPlainTextEdit->setFocus();
+  }
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)

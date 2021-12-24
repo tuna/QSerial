@@ -826,6 +826,22 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>tabWidget</sender>
+   <signal>currentChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onTabPageChanged(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>558</x>
+     <y>407</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>405</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>onSend()</slot>
@@ -836,5 +852,6 @@
   <slot>onClear()</slot>
   <slot>onToggleOpen()</slot>
   <slot>onMutualTest()</slot>
+  <slot>onTabPageChanged(int)</slot>
  </slots>
 </ui>
