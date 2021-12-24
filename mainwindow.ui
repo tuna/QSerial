@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>846</width>
-    <height>870</height>
+    <height>812</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,324 +18,247 @@
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>300</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>220</width>
-          <height>16777215</height>
-         </size>
-        </property>
+       <widget class="QGroupBox" name="groupBox_4">
         <property name="title">
          <string>Serial Port Settings</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_7">
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="label">
-             <property name="text">
-              <string>Port:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QComboBox" name="serialPortComboBox"/>
-           </item>
-          </layout>
+        <layout class="QFormLayout" name="formLayout">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Port</string>
+           </property>
+          </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Baud Rate:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QComboBox" name="baudRateComboBox">
-             <property name="editable">
-              <bool>true</bool>
-             </property>
-             <property name="currentIndex">
-              <number>7</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>1200</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2400</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>4800</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>9600</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>19200</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>38400</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>57600</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>115200</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>230400</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="serialPortComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QLabel" name="label_3">
-             <property name="text">
-              <string>Data Bits:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QComboBox" name="dataBitsComboBox">
-             <property name="currentIndex">
-              <number>3</number>
-             </property>
-             <item>
-              <property name="text">
-               <string>5</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>6</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>7</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>8</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Baud Rate</string>
+           </property>
+          </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item row="1" column="1">
+          <widget class="QComboBox" name="baudRateComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentText">
+            <string>115200</string>
+           </property>
+           <property name="currentIndex">
+            <number>7</number>
+           </property>
            <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>Parity:</string>
-             </property>
-            </widget>
+            <property name="text">
+             <string>1200</string>
+            </property>
            </item>
            <item>
-            <spacer name="horizontalSpacer_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            <property name="text">
+             <string>2400</string>
+            </property>
            </item>
            <item>
-            <widget class="QComboBox" name="parityComboBox">
-             <item>
-              <property name="text">
-               <string>No</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Even</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Odd</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Space</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Mark</string>
-              </property>
-             </item>
-            </widget>
+            <property name="text">
+             <string>4800</string>
+            </property>
            </item>
-          </layout>
+           <item>
+            <property name="text">
+             <string>9600</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>19200</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>38400</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>57600</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>115200</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>230400</string>
+            </property>
+           </item>
+          </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QLabel" name="label_5">
-             <property name="text">
-              <string>Stop Bits:</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QComboBox" name="stopBitsComboBox">
-             <item>
-              <property name="text">
-               <string>1</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>2</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>1.5</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Data Bits</string>
+           </property>
+          </widget>
          </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item row="2" column="1">
+          <widget class="QComboBox" name="dataBitsComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="currentIndex">
+            <number>3</number>
+           </property>
            <item>
-            <widget class="QLabel" name="label_6">
-             <property name="text">
-              <string>Flow Control:</string>
-             </property>
-            </widget>
+            <property name="text">
+             <string>5</string>
+            </property>
            </item>
            <item>
-            <spacer name="horizontalSpacer_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
+            <property name="text">
+             <string>6</string>
+            </property>
            </item>
            <item>
-            <widget class="QComboBox" name="flowControlComboBox">
-             <item>
-              <property name="text">
-               <string>No</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Hardware</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Software</string>
-              </property>
-             </item>
-            </widget>
+            <property name="text">
+             <string>7</string>
+            </property>
            </item>
-          </layout>
+           <item>
+            <property name="text">
+             <string>8</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>Parity</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="parityComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>No</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Even</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Odd</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Space</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Mark</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>Stop Bits</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="stopBitsComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>1</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>1.5</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Flow Control</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="flowControlComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>No</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hardware</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Software</string>
+            </property>
+           </item>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -354,294 +277,228 @@
        </spacer>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_2">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>130</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>220</width>
-          <height>130</height>
-         </size>
-        </property>
+       <widget class="QGroupBox" name="groupBox">
         <property name="title">
-         <string>Recv Settings</string>
+         <string>Receiver Settings</string>
         </property>
-        <property name="flat">
-         <bool>false</bool>
-        </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_15">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1">
+        <layout class="QFormLayout" name="formLayout_2">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>Encoding</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="recvShowAsComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <item>
-              <widget class="QLabel" name="label_7">
-               <property name="text">
-                <string>Show As:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QComboBox" name="recvShowAsComboBox">
-               <item>
-                <property name="text">
-                 <string>Text (UTF-8)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (Big5)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (GB18030)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (Shift-JIS)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Hex</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (UTF-8)</string>
+            </property>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_13">
-             <item>
-              <widget class="QCheckBox" name="recvShowTimeCheckBox">
-               <property name="text">
-                <string>Show Time</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="pushButton">
-               <property name="text">
-                <string>Clear</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (Big5)</string>
+            </property>
            </item>
-          </layout>
+           <item>
+            <property name="text">
+             <string>Text (GB18030)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Text (Shift-JIS)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Hex</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Options</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QCheckBox" name="recvShowTimeCheckBox">
+           <property name="text">
+            <string>Show Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="pushButton">
+           <property name="text">
+            <string>Clear</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
       </item>
       <item>
-       <widget class="QGroupBox" name="groupBox_3">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>220</width>
-          <height>200</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>220</width>
-          <height>16777215</height>
-         </size>
-        </property>
+       <widget class="QGroupBox" name="groupBox_2">
         <property name="title">
-         <string>Send Settings</string>
+         <string>Transmitter Settings</string>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_6">
-         <item>
-          <layout class="QVBoxLayout" name="verticalLayout_2">
+        <layout class="QFormLayout" name="formLayout_3">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Encoding</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="sendParseAsComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
-             <item>
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>Parse As:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_9">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QComboBox" name="sendParseAsComboBox">
-               <item>
-                <property name="text">
-                 <string>Text (UTF-8)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (Big5)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (GB18030)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Text (Shift-JIS)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Hex (No CRLF)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Base64</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>Percent Encoding</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (UTF-8)</string>
+            </property>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
-             <item>
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>Line Ending:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_10">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QComboBox" name="lineEndingComboBox">
-               <item>
-                <property name="text">
-                 <string>LF (\n)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>CR LF (\r \n)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>CR (\r)</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>None</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (Big5)</string>
+            </property>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_14">
-             <item>
-              <widget class="QCheckBox" name="sendShowTimeCheckBox">
-               <property name="text">
-                <string>Show Time</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="echoCheckBox">
-               <property name="text">
-                <string>Echo</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (GB18030)</string>
+            </property>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_12">
-             <item>
-              <widget class="QLabel" name="label_13">
-               <property name="text">
-                <string>Duration:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="breakDurationLineEdit">
-               <property name="placeholderText">
-                <string>ms</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QPushButton" name="breakPushButton">
-               <property name="enabled">
-                <bool>false</bool>
-               </property>
-               <property name="text">
-                <string>BREAK</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
+            <property name="text">
+             <string>Text (Shift-JIS)</string>
+            </property>
            </item>
-          </layout>
+           <item>
+            <property name="text">
+             <string>Hex (No CRLF)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Base64</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Percent Encoding</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Line Ending</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="lineEndingComboBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>LF (\n)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CR LF (\r \n)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CR (\r)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>None</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>Duration</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="breakDurationLineEdit">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>1</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="placeholderText">
+            <string>ms</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="breakPushButton">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="text">
+            <string>BREAK</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Options</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QCheckBox" name="sendShowTimeCheckBox">
+           <property name="text">
+            <string>Show Time</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="echoCheckBox">
+           <property name="text">
+            <string>Echo</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -682,7 +539,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_text">
        <attribute name="title">
