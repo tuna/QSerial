@@ -68,6 +68,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
   terminalShowing = false;
   webEngineView->hide();
+
+  statisticsLabel = new QLabel(this);
+  statusBar()->addPermanentWidget(statisticsLabel);
+  onReset(); // reset and show statistics
 }
 
 inline int fromHex(char ch) {
@@ -94,6 +98,25 @@ inline QString toHumanRate(quint64 rate) {
   }
 }
 
+void MainWindow::refreshStatistics() {
+  quint64 txspeed = 0;
+  for (auto pair : sentRecord) {
+    txspeed += pair.first;
+  }
+
+  quint64 rxspeed = 0;
+  for (auto pair : recvRecord) {
+    rxspeed += pair.first;
+  }
+
+  auto txt = QString("TX: %1 (%2)  RX: %3 (%4)")
+          .arg(bytesSent)
+          .arg(toHumanRate(txspeed))
+          .arg(bytesRecv)
+          .arg(toHumanRate(rxspeed));
+  statisticsLabel->setText(txt);
+}
+
 void MainWindow::sendBytes(const QByteArray& data) {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
 
@@ -104,17 +127,13 @@ void MainWindow::sendBytes(const QByteArray& data) {
   serialPort->sendData(data);
 
   bytesSent += data.length();
-  bytesSentLabel->setText(QString("%1").arg(bytesSent));
   qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
   sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
   while (sentRecord.first().second < currentTime - 1000) {
     sentRecord.pop_front();
   }
-  quint64 speed = 0;
-  for (auto pair : sentRecord) {
-    speed += pair.first;
-  }
-  sentSpeedLabel->setText(toHumanRate(speed));
+
+  refreshStatistics();
 }
 
 void MainWindow::onSend() {
@@ -244,17 +263,12 @@ inline char toHex(int value) {
 
 void MainWindow::onDataReceived(QByteArray data) {
   bytesRecv += data.length();
-  bytesRecvLabel->setText(QString("%1").arg(bytesRecv));
   qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
   recvRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
   while (recvRecord.first().second < currentTime - 1000) {
     recvRecord.pop_front();
   }
-  quint64 speed = 0;
-  for (auto pair : recvRecord) {
-    speed += pair.first;
-  }
-  recvSpeedLabel->setText(toHumanRate(speed));
+  refreshStatistics();
 
   QString text;
   QTextCodec *codec;
@@ -323,13 +337,10 @@ void MainWindow::appendText(QString text, QColor color) {
 
 void MainWindow::onReset() {
   bytesRecv = 0;
-  bytesRecvLabel->setText("0");
   bytesSent = 0;
-  bytesSentLabel->setText("0");
   recvRecord.clear();
-  recvSpeedLabel->setText("0");
   sentRecord.clear();
-  sentSpeedLabel->setText("0");
+  refreshStatistics();
 }
 
 void MainWindow::onIdle() {

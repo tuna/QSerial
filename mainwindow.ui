@@ -7,14 +7,14 @@
     <x>0</x>
     <y>0</y>
     <width>846</width>
-    <height>771</height>
+    <height>870</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>QSerial</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="1,3">
+   <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,3">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
@@ -379,7 +379,7 @@
         <property name="flat">
          <bool>false</bool>
         </property>
-        <layout class="QVBoxLayout" name="verticalLayout_5">
+        <layout class="QHBoxLayout" name="horizontalLayout_15">
          <item>
           <layout class="QVBoxLayout" name="verticalLayout" stretch="1,1">
            <item>
@@ -646,152 +646,47 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="QFrame" name="frame">
+        <layout class="QHBoxLayout" name="horizontalLayout_16">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QPushButton" name="resetButton">
+           <property name="text">
+            <string>Reset Statistics</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
      </layout>
     </item>
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="4,4,1">
+       <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="4,4">
         <item>
          <widget class="QTextBrowser" name="textBrowser"/>
         </item>
         <item>
-         <widget class="QWebEngineView" name="webEngineView">
-          <property name="url">
+         <widget class="QWebEngineView" name="webEngineView" native="true">
+          <property name="url" stdset="0">
            <url>
             <string>about:blank</string>
            </url>
           </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="minimumSize">
-           <size>
-            <width>150</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="title">
-           <string>Statistics</string>
-          </property>
-          <widget class="QLabel" name="label_8">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>30</y>
-             <width>101</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Bytes Sent:</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="bytesSentLabel">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>50</y>
-             <width>101</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_10">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>80</y>
-             <width>101</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Bytes Recv:</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="bytesRecvLabel">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>100</y>
-             <width>101</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_12">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>130</y>
-             <width>101</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Recv Speed:</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="recvSpeedLabel">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>150</y>
-             <width>59</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="label_14">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>180</y>
-             <width>81</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Send Speed:</string>
-           </property>
-          </widget>
-          <widget class="QLabel" name="sentSpeedLabel">
-           <property name="geometry">
-            <rect>
-             <x>10</x>
-             <y>200</y>
-             <width>59</width>
-             <height>16</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>0</string>
-           </property>
-          </widget>
-          <widget class="QPushButton" name="resetButton">
-           <property name="geometry">
-            <rect>
-             <x>0</x>
-             <y>230</y>
-             <width>114</width>
-             <height>32</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>Reset</string>
-           </property>
-          </widget>
          </widget>
         </item>
        </layout>
@@ -833,7 +728,7 @@
      <x>0</x>
      <y>0</y>
      <width>846</width>
-     <height>22</height>
+     <height>37</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSerial">
@@ -904,22 +799,6 @@
  </customwidgets>
  <resources/>
  <connections>
-  <connection>
-   <sender>resetButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>onReset()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>722</x>
-     <y>296</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>728</x>
-     <y>603</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>sendButton</sender>
    <signal>clicked()</signal>
@@ -1029,6 +908,22 @@
     <hint type="destinationlabel">
      <x>422</x>
      <y>385</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>resetButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onReset()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>122</x>
+     <y>813</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>434</y>
     </hint>
    </hints>
   </connection>

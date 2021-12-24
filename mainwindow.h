@@ -37,12 +37,14 @@ private:
   void appendText(QString text, QColor color);
   bool eventFilter(QObject *object, QEvent *event);
   void fitTerminal();
+  void refreshStatistics();
 
   quint64 bytesRecv;
   quint64 bytesSent;
   QList<QPair<quint64, qint64>> recvRecord;
   QList<QPair<quint64, qint64>> sentRecord;
   QTimer *timer;
+  QLabel *statisticsLabel;
   bool terminalShowing;
 };
 
