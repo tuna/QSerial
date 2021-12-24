@@ -314,24 +314,10 @@ void MainWindow::onDataReceived(QByteArray data) {
     // never happens
     break;
   }
-  if (recvShowTimeCheckBox->isChecked()) {
-    text = QString("[%1] %2")
-               .arg(QDateTime::currentDateTime().toString(Qt::ISODate))
-               .arg(text);
-  }
   appendText(text, Qt::red);
 }
 
 void MainWindow::appendText(QString text, QColor color) {
-  auto cursor = textBrowser->textCursor();
-  cursor.movePosition(QTextCursor::End);
-  textBrowser->setTextCursor(cursor);
-  textBrowser->setTextColor(color);
-  textBrowser->insertPlainText(text);
-  textBrowser->verticalScrollBar()->setValue(
-  textBrowser->verticalScrollBar()->maximum());
-
-
   QString arr;
   const ushort *s = text.utf16();
   while (*s != 0) {
@@ -342,6 +328,20 @@ void MainWindow::appendText(QString text, QColor color) {
   fitTerminal();
   QString js = QString("term.write(String.fromCharCode(") + arr + QString("));");
   webEngineView->page()->runJavaScript(js);
+
+  if (recvShowTimeCheckBox->isChecked()) {
+    if (!textBrowser->toPlainText().endsWith('\n')) {
+      text = QString("\n") + text;
+    }
+    text.replace("\n", QString("\n[%1] ")
+               .arg(QDateTime::currentDateTime().toString(Qt::ISODate)));
+  }
+  auto cursor = textBrowser->textCursor();
+  cursor.movePosition(QTextCursor::End);
+  textBrowser->setTextCursor(cursor);
+  textBrowser->setTextColor(color);
+  textBrowser->insertPlainText(text);
+  textBrowser->verticalScrollBar()->setValue(textBrowser->verticalScrollBar()->maximum());
 }
 
 void MainWindow::onReset() {
