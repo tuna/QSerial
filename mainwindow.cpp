@@ -72,6 +72,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   statisticsLabel = new QLabel(this);
   statusBar()->addPermanentWidget(statisticsLabel);
   onReset(); // reset and show statistics
+
+  QTimer *timer = new QTimer(this);
+  connect(timer, SIGNAL(timeout()), this, SLOT(refreshStatistics()));
+  timer->start(250);
 }
 
 inline int fromHex(char ch) {
@@ -109,6 +113,16 @@ void MainWindow::refreshStatistics() {
     rxspeed += pair.first;
   }
 
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  while (!sentRecord.isEmpty() &&
+         sentRecord.first().second < currentTime - 1000) {
+    sentRecord.pop_front();
+  }
+  while (!recvRecord.isEmpty() &&
+         recvRecord.first().second < currentTime - 1000) {
+    recvRecord.pop_front();
+  }
+
   auto txt = QString("TX: %1 (%2)  RX: %3 (%4)")
           .arg(bytesSent)
           .arg(toHumanRate(txspeed))
@@ -129,11 +143,6 @@ void MainWindow::sendBytes(const QByteArray& data) {
   bytesSent += data.length();
   qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
   sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-  while (sentRecord.first().second < currentTime - 1000) {
-    sentRecord.pop_front();
-  }
-
-  refreshStatistics();
 }
 
 void MainWindow::onSend() {
@@ -265,10 +274,6 @@ void MainWindow::onDataReceived(QByteArray data) {
   bytesRecv += data.length();
   qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
   recvRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-  while (recvRecord.first().second < currentTime - 1000) {
-    recvRecord.pop_front();
-  }
-  refreshStatistics();
 
   QString text;
   QTextCodec *codec;

@@ -31,13 +31,13 @@ private slots:
   void onDataReceived(QByteArray data);
   void onIdle();
   void onBreakChanged(bool set);
+  void refreshStatistics();
 
 private:
   QList<SerialPort *> ports;
   void appendText(QString text, QColor color);
   bool eventFilter(QObject *object, QEvent *event);
   void fitTerminal();
-  void refreshStatistics();
 
   quint64 bytesRecv;
   quint64 bytesSent;
