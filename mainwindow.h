@@ -6,12 +6,14 @@
 #include <QMainWindow>
 #include <QSerialPort>
 #include <QWidget>
+#include <QJsonArray>
 
 class MainWindow : public QMainWindow, private Ui::MainWindow {
   Q_OBJECT
 
 public:
   explicit MainWindow(QWidget *parent = nullptr);
+  void sendBytes(const QByteArray &data);
 
 protected:
    void resizeEvent(QResizeEvent *event);
@@ -42,6 +44,20 @@ private:
   QList<QPair<quint64, qint64>> sentRecord;
   QTimer *timer;
   bool terminalShowing;
+};
+
+class JsInterface : public QObject
+{
+  Q_OBJECT
+private:
+  MainWindow* parentWindow;
+
+public:
+  JsInterface(MainWindow *_parent) : QObject(_parent) {
+    parentWindow = _parent;
+  }
+
+  Q_INVOKABLE void sendBytes(const QJsonArray& data) const;
 };
 
 #endif

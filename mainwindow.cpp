@@ -7,6 +7,8 @@
 #include <QSerialPortInfo>
 #include <QTextCodec>
 #include <QTimer>
+#include <QWebChannel>
+#include <QMessageBox>
 
 #define INDEX_LINE_LF 0
 #define INDEX_LINE_CRLF 1
@@ -26,6 +28,16 @@
 #define INDEX_RECV_GB18030 2
 #define INDEX_RECV_SHIFTJIS 3
 #define INDEX_RECV_HEX 4
+
+void JsInterface::sendBytes(const QJsonArray& dat) const {
+  QJsonArray::const_iterator itrArray = dat.begin();
+  QByteArray aryBytes;
+  while( itrArray != dat.end() ) {
+    aryBytes.append(static_cast<char>(itrArray->toInt()));
+    itrArray++;
+  }
+  parentWindow->sendBytes(aryBytes);
+}
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   setupUi(this);
@@ -48,6 +60,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
   inputPlainTextEdit->installEventFilter(this);
   webEngineView->load(QUrl("qrc:/resources/index.html"));
+
+  QWebChannel* channel = new QWebChannel(webEngineView);
+  JsInterface* intf = new JsInterface(this);
+  webEngineView->page()->setWebChannel(channel);
+  channel->registerObject(QString("interface"), intf);
 
   terminalShowing = false;
   webEngineView->hide();
@@ -77,12 +94,31 @@ inline QString toHumanRate(quint64 rate) {
   }
 }
 
-void MainWindow::onSend() {
+void MainWindow::sendBytes(const QByteArray& data) {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  onOpen();
+
   if (!serialPort->isOpen()) {
     return;
   }
+
+  serialPort->sendData(data);
+
+  bytesSent += data.length();
+  bytesSentLabel->setText(QString("%1").arg(bytesSent));
+  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
+  sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
+  while (sentRecord.first().second < currentTime - 1000) {
+    sentRecord.pop_front();
+  }
+  quint64 speed = 0;
+  for (auto pair : sentRecord) {
+    speed += pair.first;
+  }
+  sentSpeedLabel->setText(toHumanRate(speed));
+}
+
+void MainWindow::onSend() {
+  onOpen();
 
   auto text = inputPlainTextEdit->toPlainText();
   auto codec = QTextCodec::codecForName("UTF-8");
@@ -190,20 +226,8 @@ void MainWindow::onSend() {
     }
     appendText(text, Qt::green);
   }
-  serialPort->sendData(data);
 
-  bytesSent += data.length();
-  bytesSentLabel->setText(QString("%1").arg(bytesSent));
-  qint64 currentTime = QDateTime::currentMSecsSinceEpoch();
-  sentRecord.push_back(QPair<quint64, qint64>(data.length(), currentTime));
-  while (sentRecord.first().second < currentTime - 1000) {
-    sentRecord.pop_front();
-  }
-  quint64 speed = 0;
-  for (auto pair : sentRecord) {
-    speed += pair.first;
-  }
-  sentSpeedLabel->setText(toHumanRate(speed));
+  sendBytes(data);
 
   inputPlainTextEdit->setFocus();
 }
