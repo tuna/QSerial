@@ -29,6 +29,7 @@ private slots:
   void onToggleOpen();
   void onMutualTest();
   void onTabPageChanged(int index);
+  void refreshStatistics();
 
   void onDataReceived(QByteArray data);
   void onIdle();
@@ -39,7 +40,6 @@ private:
   void appendText(QString text, QColor color);
   bool eventFilter(QObject *object, QEvent *event);
   void fitTerminal();
-  void refreshStatistics();
   void refreshOpenStatus();
   void saveSettings();
   void loadSettings();
