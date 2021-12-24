@@ -66,9 +66,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   webEngineView->page()->setWebChannel(channel);
   channel->registerObject(QString("interface"), intf);
 
-  terminalShowing = false;
-  webEngineView->hide();
-
   statisticsLabel = new QLabel(this);
   statusBar()->addPermanentWidget(statisticsLabel);
   onReset(); // reset and show statistics
@@ -442,17 +439,6 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
         }
     }
     return QMainWindow::eventFilter(object, event);
-}
-
-void MainWindow::onToggleTerminal() {
-  terminalShowing = !terminalShowing;
-  if (terminalShowing) {
-    webEngineView->show();
-    textBrowser->hide();
-  } else {
-    webEngineView->hide();
-    textBrowser->show();
-  }
 }
 
 void MainWindow::fitTerminal() {

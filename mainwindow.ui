@@ -14,7 +14,7 @@
    <string>QSerial</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,3">
+   <layout class="QHBoxLayout" name="horizontalLayout_23" stretch="0,0">
     <item>
      <layout class="QVBoxLayout" name="verticalLayout_3">
       <item>
@@ -674,12 +674,75 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1">
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="4,4">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>1</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="currentIndex">
+       <number>1</number>
+      </property>
+      <widget class="QWidget" name="tab_text">
+       <attribute name="title">
+        <string>Text</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_18">
         <item>
-         <widget class="QTextBrowser" name="textBrowser"/>
+         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="3,1">
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="4">
+            <item>
+             <widget class="QTextBrowser" name="textBrowser"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_8">
+            <item>
+             <widget class="QPlainTextEdit" name="inputPlainTextEdit">
+              <property name="plainText">
+               <string/>
+              </property>
+              <property name="placeholderText">
+               <string>Shift+Enter to send</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="sendButton">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>50</height>
+               </size>
+              </property>
+              <property name="text">
+               <string>Open and Send</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_term">
+       <attribute name="title">
+        <string>Terminal</string>
+       </attribute>
+       <layout class="QHBoxLayout" name="horizontalLayout_17">
+        <property name="leftMargin">
+         <number>12</number>
+        </property>
+        <property name="rightMargin">
+         <number>12</number>
+        </property>
+        <property name="bottomMargin">
+         <number>12</number>
+        </property>
         <item>
          <widget class="QWebEngineView" name="webEngineView" native="true">
           <property name="url" stdset="0">
@@ -690,35 +753,8 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_8">
-        <item>
-         <widget class="QPlainTextEdit" name="inputPlainTextEdit">
-          <property name="plainText">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>Shift+Enter to send</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="sendButton">
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>50</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Open and Send</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-     </layout>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -743,7 +779,6 @@
      <string>Tools</string>
     </property>
     <addaction name="actionMutual_Test"/>
-    <addaction name="actionEnable_Terminal"/>
    </widget>
    <addaction name="menuSerial"/>
    <addaction name="menuTools"/>
@@ -782,11 +817,6 @@
   <action name="actionMutual_Test">
    <property name="text">
     <string>Mutual Test</string>
-   </property>
-  </action>
-  <action name="actionEnable_Terminal">
-   <property name="text">
-    <string>Toggle Terminal</string>
    </property>
   </action>
  </widget>
@@ -896,22 +926,6 @@
    </hints>
   </connection>
   <connection>
-   <sender>actionEnable_Terminal</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>onToggleTerminal()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>422</x>
-     <y>385</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
    <sender>resetButton</sender>
    <signal>clicked()</signal>
    <receiver>MainWindow</receiver>
@@ -936,6 +950,5 @@
   <slot>onBreak()</slot>
   <slot>onClear()</slot>
   <slot>onMutualTest()</slot>
-  <slot>onToggleTerminal()</slot>
  </slots>
 </ui>
