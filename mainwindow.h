@@ -25,18 +25,20 @@ private slots:
   void onClear();
   void onOpen();
   void onClose();
+  void onToggleOpen();
   void onMutualTest();
 
   void onDataReceived(QByteArray data);
   void onIdle();
   void onBreakChanged(bool set);
-  void refreshStatistics();
 
 private:
   QList<SerialPort *> ports;
   void appendText(QString text, QColor color);
   bool eventFilter(QObject *object, QEvent *event);
   void fitTerminal();
+  void refreshStatistics();
+  void refreshOpenStatus();
 
   quint64 bytesRecv;
   quint64 bytesSent;
@@ -44,6 +46,8 @@ private:
   QList<QPair<quint64, qint64>> sentRecord;
   QTimer *timer;
   QLabel *statisticsLabel;
+  QIcon playIcon, stopIcon;
+  bool isOpened;
 };
 
 class JsInterface : public QObject

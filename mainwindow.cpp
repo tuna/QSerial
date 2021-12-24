@@ -73,6 +73,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
   QTimer *timer = new QTimer(this);
   connect(timer, SIGNAL(timeout()), this, SLOT(refreshStatistics()));
   timer->start(250);
+
+  playIcon = QIcon(":/resources/play.svg");
+  stopIcon = QIcon(":/resources/stop.svg");
+  isOpened = false;
+  refreshOpenStatus();
 }
 
 inline int fromHex(char ch) {
@@ -350,10 +355,40 @@ void MainWindow::onIdle() {
   libusb_handle_events_timeout_completed(context, &tv, nullptr);
 }
 
+void MainWindow::refreshOpenStatus() {
+  auto serialPort = ports[serialPortComboBox->currentIndex()];
+
+  if (!isOpened) {
+    statusBar()->showMessage("");
+    serialPortComboBox->setEnabled(true);
+    baudRateComboBox->setEnabled(true);
+    dataBitsComboBox->setEnabled(true);
+    parityComboBox->setEnabled(true);
+    stopBitsComboBox->setEnabled(true);
+    flowControlComboBox->setEnabled(true);
+    sendButton->setText("Open and Send");
+    breakPushButton->setEnabled(false);
+    openCloseButton->setText("Open");
+    openCloseButton->setIcon(playIcon);
+  } else {
+    serialPortComboBox->setEnabled(false);
+    baudRateComboBox->setEnabled(false);
+    dataBitsComboBox->setEnabled(false);
+    parityComboBox->setEnabled(false);
+    stopBitsComboBox->setEnabled(false);
+    flowControlComboBox->setEnabled(false);
+    sendButton->setText("Send");
+    breakPushButton->setEnabled(true);
+    openCloseButton->setText("Close");
+    openCloseButton->setIcon(stopIcon);
+  }
+}
+
 void MainWindow::onOpen() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  if (!serialPort->isOpen()) {
+  if (!isOpened) {
     if (serialPort->open()) {
+      isOpened = true;
       serialPort->setBaudRate(baudRateComboBox->currentText().toInt());
       serialPort->setDataBits(
           (QSerialPort::DataBits)dataBitsComboBox->currentText().toInt());
@@ -375,14 +410,7 @@ void MainWindow::onOpen() {
                                    .arg(parityName[serialPort->getParity() + 1]) // getParity() may return -1
                                    .arg(stopBitsComboBox->currentText())
                                    .arg(flowControlComboBox->currentText()));
-      serialPortComboBox->setEnabled(false);
-      baudRateComboBox->setEnabled(false);
-      dataBitsComboBox->setEnabled(false);
-      parityComboBox->setEnabled(false);
-      stopBitsComboBox->setEnabled(false);
-      flowControlComboBox->setEnabled(false);
-      sendButton->setText("Send");
-      breakPushButton->setEnabled(true);
+      refreshOpenStatus();
     } else {
       statusBar()->showMessage("Failed");
     }
@@ -391,17 +419,18 @@ void MainWindow::onOpen() {
 
 void MainWindow::onClose() {
   auto serialPort = ports[serialPortComboBox->currentIndex()];
-  if (serialPort->isOpen()) {
+  if (isOpened) {
+    isOpened = false;
     serialPort->close();
-    statusBar()->showMessage("");
-    serialPortComboBox->setEnabled(true);
-    baudRateComboBox->setEnabled(true);
-    dataBitsComboBox->setEnabled(true);
-    parityComboBox->setEnabled(true);
-    stopBitsComboBox->setEnabled(true);
-    flowControlComboBox->setEnabled(true);
-    sendButton->setText("Open and Send");
-    breakPushButton->setEnabled(false);
+    refreshOpenStatus();
+  }
+}
+
+void MainWindow::onToggleOpen() {
+  if (isOpened) {
+    onClose();
+  } else {
+    onOpen();
   }
 }
 
@@ -421,7 +450,7 @@ void MainWindow::onBreakChanged(bool set) {
 
 void MainWindow::onClear() {
   textBrowser->setPlainText("");
-  webEngineView->page()->runJavaScript(QString("term.clear()"));
+  webEngineView->page()->runJavaScript(QString("if (term) term.clear();"));
 }
 
 void MainWindow::onMutualTest() {
@@ -442,7 +471,7 @@ bool MainWindow::eventFilter(QObject *object, QEvent *event) {
 }
 
 void MainWindow::fitTerminal() {
-   webEngineView->page()->runJavaScript(QString("term.fit()"));
+   webEngineView->page()->runJavaScript(QString("if (term) term.fit();"));
 }
 
 void MainWindow::resizeEvent(QResizeEvent* event)

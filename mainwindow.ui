@@ -260,6 +260,30 @@
            </item>
           </widget>
          </item>
+         <item row="6" column="1">
+          <widget class="QPushButton" name="openCloseButton">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>Open</string>
+           </property>
+           <property name="icon">
+            <iconset resource="resources.qrc">
+             <normaloff>:/resources/play.svg</normaloff>:/resources/play.svg</iconset>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>Action</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -641,20 +665,6 @@
    <addaction name="menuTools"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolBar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
-   <addaction name="actionOpen"/>
-   <addaction name="actionClose"/>
-   <addaction name="actionMutual_Test"/>
-  </widget>
   <action name="actionOpen">
    <property name="text">
     <string>Open</string>
@@ -684,7 +694,9 @@
    <header location="global">QtWebEngineWidgets/QWebEngineView</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>sendButton</sender>
@@ -693,8 +705,8 @@
    <slot>onSend()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>821</x>
-     <y>639</y>
+     <x>816</x>
+     <y>698</y>
     </hint>
     <hint type="destinationlabel">
      <x>668</x>
@@ -741,8 +753,8 @@
    <slot>onBreak()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>216</x>
-     <y>713</y>
+     <x>177</x>
+     <y>716</y>
     </hint>
     <hint type="destinationlabel">
      <x>159</x>
@@ -757,8 +769,8 @@
    <slot>onClear()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>176</x>
-     <y>500</y>
+     <x>153</x>
+     <y>483</y>
     </hint>
     <hint type="destinationlabel">
      <x>226</x>
@@ -789,12 +801,28 @@
    <slot>onReset()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>122</x>
-     <y>813</y>
+     <x>135</x>
+     <y>771</y>
     </hint>
     <hint type="destinationlabel">
      <x>422</x>
      <y>434</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>openCloseButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>onToggleOpen()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>184</x>
+     <y>313</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>422</x>
+     <y>405</y>
     </hint>
    </hints>
   </connection>
@@ -806,6 +834,7 @@
   <slot>onClose()</slot>
   <slot>onBreak()</slot>
   <slot>onClear()</slot>
+  <slot>onToggleOpen()</slot>
   <slot>onMutualTest()</slot>
  </slots>
 </ui>
