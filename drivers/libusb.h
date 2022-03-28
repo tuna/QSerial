@@ -2,7 +2,7 @@
 #define COMMON_H
 
 #include <libusb.h>
-static libusb_context *context = nullptr;
+extern libusb_context *context;
 
 #endif
 
