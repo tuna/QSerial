@@ -10,7 +10,9 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 COMPONENTS Core Gui Widgets SerialPort Core5Compat WebEngineWidgets REQUIRED)
+# Try Qt5 & Qt6
+find_package(Qt5 COMPONENTS Core Gui Widgets SerialPort WebEngineWidgets)
+find_package(Qt6 COMPONENTS Core Gui Widgets SerialPort Core5Compat WebEngineWidgets)
 
 set(MAIN_SOURCES main.cpp mainwindow.cpp mutualtest.cpp) 
 file(GLOB_RECURSE DRIVER_SOURCES drivers/*.cpp)
@@ -24,4 +26,13 @@ pkg_search_module(LIBUSB_1 REQUIRED libusb-1.0)
 add_executable(QSerial ${MAIN_SOURCES} ${DRIVER_SOURCES} ${UI} ${RESOURCES} drivers/serialportdummy.h)
 target_include_directories(QSerial PRIVATE ${LIBUSB_1_INCLUDE_DIRS})
 target_link_directories(QSerial PRIVATE ${LIBUSB_1_LIBRARY_DIRS})
+
+if (Qt5_FOUND)
+target_link_libraries(QSerial Qt5::Widgets Qt5::SerialPort Qt5::WebEngineWidgets ${LIBUSB_1_LIBRARIES})
+endif ()
+
+if (Qt6_FOUND)
 target_link_libraries(QSerial Qt6::Widgets Qt6::SerialPort Qt6::Core5Compat Qt6::WebEngineWidgets ${LIBUSB_1_LIBRARIES})
+endif ()
+
+install(TARGETS QSerial)

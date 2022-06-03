@@ -1,6 +1,8 @@
 .ccls-cache/
 .qmake.stash
 **/*/.vscode/
+build/
+result
 
 # Created by https://www.gitignore.io/api/c++,cmake,visualstudiocode
 
