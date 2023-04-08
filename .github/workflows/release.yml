@@ -29,3 +29,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: QSerial.dmg
+
+permissions:
+  contents: write
