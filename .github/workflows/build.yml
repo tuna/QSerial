@@ -21,6 +21,8 @@ jobs:
           sudo apt install libusb-1.0-0-dev
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
+      with:
+        modules: serialport webenginewidgets core5compat
 
     - name: Build on ${{ matrix.os }}
       shell: bash
