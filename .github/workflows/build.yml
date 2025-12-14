@@ -1,27 +1,68 @@
 name: Qt CI
+name: Build Qt Application
 
 on:
   push:
-    branches: [ master ]
   pull_request:
-    branches: [ master ]
+  workflow_dispatch:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        qt_version: ['5.15.2']
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Install libusb
+      if: runner.os == 'Linux'
       run: |
           sudo apt update
           sudo apt install libusb-1.0-0-dev
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v4
       with:
-          modules: qtwebengine
-    - name: qmake
-      run: qmake qserial.pro
-    - name: make
-      run: make
+        version: ${{ matrix.qt_version }}
+        host: ${{ matrix.os }}
+        target: desktop
+        arch: x64
+
+    - name: Build on ${{ matrix.os }}
+      shell: bash
+      run: |
+        mkdir build
+        cd build
+        qmake ../qserial.pro
+        if [[ "${{ runner.os }}" == "Windows" ]]; then
+          nmake || jom
+        else
+          make -j$(nproc)
+        fi
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: qserial-${{ matrix.os }}
+        path: |
+          build/*.exe
+          build/qserial
+          build/*.app
+        if-no-files-found: error
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
