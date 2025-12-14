@@ -23,7 +23,8 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         modules: qtwebchannel qtpositioning qtserialport qt5compat qtwebengine
-
+    - uses: microsoft/setup-msbuild@v2
+      if: runner.os == 'Windows'
     - name: Build on ${{ matrix.os }}
       shell: bash
       run: |
