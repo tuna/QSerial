@@ -1,5 +1,4 @@
 name: Qt CI
-name: Build Qt Application
 
 on:
   push:
