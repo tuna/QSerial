@@ -11,7 +11,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-15]
-        qt_version: ['6.*']
 
     steps:
     - uses: actions/checkout@v4
@@ -22,8 +21,6 @@ jobs:
           sudo apt install libusb-1.0-0-dev
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ matrix.qt_version }}
 
     - name: Build on ${{ matrix.os }}
       shell: bash
