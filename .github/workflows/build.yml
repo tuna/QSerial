@@ -10,7 +10,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ubuntu-latest, windows-2019, macos-15]
         qt_version: ['5.15.2']
 
     steps:
@@ -24,8 +24,6 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
-        host: ${{ matrix.os }}
-        target: desktop
         arch: x64
 
     - name: Build on ${{ matrix.os }}
