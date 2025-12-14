@@ -22,7 +22,7 @@ jobs:
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
       with:
-        modules: serialport webenginewidgets core5compat
+        modules: qtserialport qt5compat qtwebengine
 
     - name: Build on ${{ matrix.os }}
       shell: bash
