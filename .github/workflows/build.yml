@@ -23,19 +23,23 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         modules: qtwebchannel qtpositioning qtserialport qt5compat qtwebengine
-    - uses: microsoft/setup-msbuild@v2
-      if: runner.os == 'Windows'
     - name: Build on ${{ matrix.os }}
-      shell: bash
+      shell: cmd
+      if: runner.os == 'Windows'
       run: |
         mkdir build
         cd build
         qmake ../qserial.pro
-        if [[ "${{ runner.os }}" == "Windows" ]]; then
-          nmake || jom
-        else
-          make -j$(nproc)
-        fi
+        nmake || jom
+    - name: Build on ${{ matrix.os }}
+      shell: bash
+      if: runner.os != 'Windows'
+      run: |
+        mkdir build
+        cd build
+        qmake ../qserial.pro
+        make -j$(nproc)
+        
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
