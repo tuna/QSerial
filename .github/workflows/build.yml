@@ -23,14 +23,15 @@ jobs:
       uses: jurplel/install-qt-action@v4
       with:
         modules: qtwebchannel qtpositioning qtserialport qt5compat qtwebengine
+    - uses: ilammy/msvc-dev-cmd@v1
     - name: Build on ${{ matrix.os }}
       shell: cmd
       if: runner.os == 'Windows'
       run: |
-        mkdir build
+        md build
         cd build
         qmake ../qserial.pro
-        nmake || jom
+        nmake
     - name: Build on ${{ matrix.os }}
       shell: bash
       if: runner.os != 'Windows'
@@ -40,6 +41,19 @@ jobs:
         qmake ../qserial.pro
         make -j$(nproc)
         
+    - name: Deploy (Windows)
+      if: matrix.os == 'windows-latest'
+      run: windeployqt build/QSerial.exe
+
+    - name: Deploy (macOS)
+      if: matrix.os == 'macos-15'
+      run: macdeployqt build/QSerial.app -dmg
+
+    - name: Deploy (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        # Example using linuxdeployqt or creating a simple tarball
+        tar -czvf QSerial-Linux.tar.gz build/QSerial
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -47,8 +61,8 @@ jobs:
         name: qserial-${{ matrix.os }}
         path: |
           build/*.exe
-          build/qserial
-          build/*.app
+          *-Linux.tar.gz
+          build/*.dmg
         if-no-files-found: error
 
   release:
