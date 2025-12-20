@@ -24,10 +24,12 @@ jobs:
       with:
         modules: qtwebchannel qtpositioning qtserialport qt5compat qtwebengine
     - uses: ilammy/msvc-dev-cmd@v1
+    - uses: lukka/run-vcpkg@v11
     - name: Build on ${{ matrix.os }}
       shell: cmd
       if: runner.os == 'Windows'
       run: |
+        vcpkg install libusb
         md build
         cd build
         qmake ../qserial.pro
