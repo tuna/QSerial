@@ -1,6 +1,8 @@
 #include "serialportcp210x.h"
 #include <QDebug>
 #include <QVector>
+#include <QtGlobal>
+
 
 #define CP210X_CTRL_IN                                                         \
   (LIBUSB_RECIPIENT_INTERFACE | LIBUSB_REQUEST_TYPE_VENDOR | LIBUSB_ENDPOINT_IN)
