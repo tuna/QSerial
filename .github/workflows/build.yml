@@ -30,6 +30,7 @@ jobs:
       run: |
         vcpkg install libusb
         dir /s C:\vcpkg
+        set PKG_CONFIG_PATH=C:/vcpkg/packages/libusb_x64-windows/lib/pkgconfig;%PKG_CONFIG_PATH%
         md build
         cd build
         qmake ../qserial.pro
