@@ -28,14 +28,20 @@
 
 #define TIMEOUT 300
 
-struct Q_PACKED SerialStatusResponse {
-  quint32 ulErrors;
-  quint32 ulHoldReasons;
-  quint32 ulAmountInInQueue;
-  quint32 ulAmountInOutQueue;
-  quint8 bEofReceived;
-  quint8 bWaitForImmediate;
-  quint8 bReserved;
+#ifdef _MSC_VER
+    #define PACKED_STRUCT __declspec(align(1))
+#else
+    #define PACKED_STRUCT __attribute__((packed))
+#endif
+
+struct PACKED_STRUCT SerialStatusResponse {
+  uint32_t ulErrors;
+  uint32_t ulHoldReasons;
+  uint32_t ulAmountInInQueue;
+  uint32_t ulAmountInOutQueue;
+  uint8_t bEofReceived;
+  uint8_t bWaitForImmediate;
+  uint8_t bReserved;
 };
 
 SerialPortCP210X::SerialPortCP210X(QObject *parent, libusb_device *device)
