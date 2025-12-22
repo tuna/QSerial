@@ -35,7 +35,7 @@ jobs:
         qmake ../qserial.pro
         nmake
         dir /s 
-        del build\release\*.obj build\release\*.cpp
+        del release\*.obj release\*.cpp
     - name: Build on ${{ matrix.os }}
       shell: bash
       if: runner.os != 'Windows'
