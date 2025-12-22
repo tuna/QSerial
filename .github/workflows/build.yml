@@ -29,12 +29,12 @@ jobs:
       if: runner.os == 'Windows'
       run: |
         vcpkg install libusb
-        dir /s C:\vcpkg
         set PKG_CONFIG_PATH=C:/vcpkg/packages/libusb_x64-windows/lib/pkgconfig;%PKG_CONFIG_PATH%
         md build
         cd build
         qmake ../qserial.pro
         nmake
+        dir /s 
     - name: Build on ${{ matrix.os }}
       shell: bash
       if: runner.os != 'Windows'
@@ -46,7 +46,7 @@ jobs:
         
     - name: Deploy (Windows)
       if: matrix.os == 'windows-latest'
-      run: windeployqt build/QSerial.exe
+      run: windeployqt build/release/QSerial.exe
 
     - name: Deploy (macOS)
       if: matrix.os == 'macos-15'
@@ -56,6 +56,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       run: |
         # Example using linuxdeployqt or creating a simple tarball
+        ldd build/QSerial
         tar -czvf QSerial-Linux.tar.gz build/QSerial
 
     - name: Upload Artifacts
@@ -63,7 +64,7 @@ jobs:
       with:
         name: qserial-${{ matrix.os }}
         path: |
-          build/*.exe
+          build/release
           *-Linux.tar.gz
           build/*.dmg
         if-no-files-found: error
