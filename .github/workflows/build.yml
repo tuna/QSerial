@@ -35,6 +35,7 @@ jobs:
         qmake ../qserial.pro
         nmake
         dir /s 
+        del build\release\*.obj build\release\*.cpp
     - name: Build on ${{ matrix.os }}
       shell: bash
       if: runner.os != 'Windows'
@@ -57,7 +58,7 @@ jobs:
       run: |
         # Example using linuxdeployqt or creating a simple tarball
         ldd build/QSerial
-        tar -czvf QSerial-Linux.tar.gz build/QSerial
+        #tar -czvf QSerial-Linux.tar.gz build/QSerial
 
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
@@ -65,7 +66,7 @@ jobs:
         name: qserial-${{ matrix.os }}
         path: |
           build/release
-          *-Linux.tar.gz
+          build/QSerial
           build/*.dmg
         if-no-files-found: error
 
